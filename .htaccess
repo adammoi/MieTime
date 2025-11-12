@@ -1,0 +1,43 @@
+# Mie Time - .htaccess (Minimal for Testing)
+
+# Prevent directory listing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "^(config\.php|\.htaccess)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Enable mod_rewrite IF available
+# ...existing code...
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /workshop/mie-time/
+
+# Skip real files and directories
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Auth routes
+RewriteRule ^login$ pages/auth/login.php [L]
+RewriteRule ^register$ pages/auth/register.php [L]
+RewriteRule ^logout$ pages/auth/logout.php [L]
+
+# Warung routes
+RewriteRule ^warung$ pages/locations/list.php [L,QSA]
+RewriteRule ^warung/([0-9]+)$ pages/locations/detail.php?id=$1 [L,QSA]
+RewriteRule ^warung/add$ pages/locations/add.php [L]
+
+# User routes
+RewriteRule ^dashboard$ pages/user/dashboard.php [L]
+RewriteRule ^profile$ pages/user/profile.php [L]
+RewriteRule ^badges$ pages/user/badges.php [L]
+
+# Other routes
+RewriteRule ^search$ pages/search/index.php [L,QSA]
+RewriteRule ^leaderboard$ pages/leaderboard/index.php [L]
+RewriteRule ^admin$ admin/index.php [L]
+
+</IfModule>
