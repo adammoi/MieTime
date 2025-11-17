@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             create_notification(
                 $review['user_id'],
                 "Review Anda di <strong>{$review['location_name']}</strong> telah disetujui!",
-                "warung/{$review['location_id']}"
+                "kedai/{$review['location_id']}"
             );
 
             set_flash('success', 'Review berhasil disetujui');
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             create_notification(
                 $review['user_id'],
                 "Review Anda di <strong>{$review['location_name']}</strong> ditolak: $reason",
-                "warung/{$review['location_id']}"
+                "kedai/{$review['location_id']}"
             );
 
             set_flash('success', 'Review ditolak');
@@ -84,7 +84,7 @@ include '../includes/header.php';
                         <i class="fas fa-users me-2"></i>Pengguna
                     </a>
                     <a href="<?php echo BASE_URL; ?>admin/locations" class="list-group-item list-group-item-action">
-                        <i class="fas fa-store me-2"></i>Warung
+                        <i class="fas fa-store me-2"></i>Kedai
                     </a>
                     <a href="<?php echo BASE_URL; ?>" class="list-group-item list-group-item-action text-primary">
                         <i class="fas fa-arrow-left me-2"></i>Kembali ke Situs
@@ -222,9 +222,9 @@ include '../includes/header.php';
                                                             <strong>User ID:</strong> #<?php echo $review['user_id']; ?>
                                                         </div>
                                                         <div>
-                                                            <a href="<?php echo BASE_URL; ?>warung/<?php echo $review['location_id']; ?>"
+                                                            <a href="<?php echo BASE_URL; ?>kedai/<?php echo $review['location_id']; ?>"
                                                                 target="_blank" class="btn btn-sm btn-outline-primary w-100">
-                                                                <i class="fas fa-external-link-alt me-2"></i>Lihat Warung
+                                                                <i class="fas fa-external-link-alt me-2"></i>Lihat Kedai
                                                             </a>
                                                         </div>
                                                     </div>
@@ -256,7 +256,7 @@ include '../includes/header.php';
                                                     <option value="Mengandung kata kasar">Mengandung kata kasar</option>
                                                     <option value="Spam atau promosi">Spam atau promosi</option>
                                                     <option value="Informasi tidak akurat">Informasi tidak akurat</option>
-                                                    <option value="Tidak relevan dengan warung">Tidak relevan dengan warung</option>
+                                                    <option value="Tidak relevan dengan kedai">Tidak relevan dengan kedai</option>
                                                     <option value="Melanggar guidelines">Melanggar guidelines</option>
                                                 </select>
                                             </div>
