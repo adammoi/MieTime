@@ -3,7 +3,9 @@ Mie Time - Form Tambah Review<?php
                                  * Mie Time - Form Tambah Review
                                  */
 
-                                define('MIE_TIME', true);
+                                if (!defined('MIE_TIME')) {
+                                    define('MIE_TIME', true);
+                                }
                                 require_once '../../config.php';
                                 require_once '../../includes/db.php';
                                 require_once '../../includes/functions.php';
@@ -17,8 +19,8 @@ Mie Time - Form Tambah Review<?php
                                 // Get location
                                 $location = get_location_by_id($location_id);
                                 if (!$location) {
-                                    set_flash('error', 'Warung tidak ditemukan');
-                                    redirect('warung');
+                                    set_flash('error', 'Kedai tidak ditemukan');
+                                    redirect('kedai');
                                 }
 
                                 $errors = [];
@@ -47,7 +49,7 @@ Mie Time - Form Tambah Review<?php
                                         [$location_id, get_current_user_id()]
                                     );
                                     if ($existing) {
-                                        $errors[] = 'Anda sudah pernah me-review warung ini';
+                                        $errors[] = 'Anda sudah pernah me-review kedai ini';
                                     }
 
                                     // Auto moderation
@@ -131,7 +133,7 @@ Mie Time - Form Tambah Review<?php
                                                 ? "Review Anda di <strong>{$location['name']}</strong> telah dipublikasikan! +" . POINTS_PER_REVIEW . " poin"
                                                 : "Review Anda di <strong>{$location['name']}</strong> sedang ditinjau moderator";
 
-                                            create_notification(get_current_user_id(), $notif_msg, "warung/$location_id");
+                                            create_notification(get_current_user_id(), $notif_msg, "kedai/$location_id");
 
                                             db_commit();
 
@@ -139,7 +141,7 @@ Mie Time - Form Tambah Review<?php
                                                 ? 'Review berhasil dipublikasikan! Terima kasih atas kontribusinya.'
                                                 : 'Review Anda sedang ditinjau oleh moderator. Terima kasih!');
 
-                                            redirect('warung/' . $location_id);
+                                            redirect('kedai/' . $location_id);
                                         } catch (Exception $e) {
                                             db_rollback();
                                             $errors[] = 'Terjadi kesalahan saat menyimpan review: ' . $e->getMessage();
@@ -260,7 +262,7 @@ Mie Time - Form Tambah Review<?php
                                 <li>Tulis review yang jujur dan membantu</li>
                                 <li>Fokus pada rasa, porsi, pelayanan, dan kebersihan</li>
                                 <li>Hindari kata-kata kasar atau tidak pantas</li>
-                                <li>Jangan promosikan warung lain atau cantumkan kontak pribadi</li>
+                                <li>Jangan promosikan kedai lain atau cantumkan kontak pribadi</li>
                             </ul>
                         </div>
 
@@ -269,7 +271,7 @@ Mie Time - Form Tambah Review<?php
                             <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
                                 <i class="fas fa-paper-plane me-2"></i>Kirim Review
                             </button>
-                            <a href="<?php echo BASE_URL; ?>warung/<?php echo $location_id; ?>"
+                            <a href="<?php echo BASE_URL; ?>kedai/<?php echo $location_id; ?>"
                                 class="btn btn-outline-secondary btn-lg">
                                 <i class="fas fa-times me-2"></i>Batal
                             </a>

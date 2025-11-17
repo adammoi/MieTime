@@ -1,7 +1,8 @@
 <?php
 
-
-define('MIE_TIME', true);
+if (!defined('MIE_TIME')) {
+    define('MIE_TIME', true);
+}
 require_once '../../config.php';
 require_once '../../includes/db.php';
 require_once '../../includes/functions.php';
@@ -117,8 +118,8 @@ include '../../includes/header.php';
                         <div class="text-center py-5">
                             <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
                             <p class="text-muted mb-3">Anda belum menulis review</p>
-                            <a href="<?php echo BASE_URL; ?>warung" class="btn btn-primary">
-                                <i class="fas fa-search me-2"></i>Cari Warung
+                            <a href="<?php echo BASE_URL; ?>kedai" class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i>Cari Kedai
                             </a>
                         </div>
                     <?php else: ?>
@@ -128,7 +129,7 @@ include '../../includes/header.php';
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <div>
                                             <h6 class="mb-1">
-                                                <a href="<?php echo BASE_URL; ?>warung/<?php echo $review['location_id']; ?>"
+                                                <a href="<?php echo BASE_URL; ?>kedai/<?php echo $review['location_id']; ?>"
                                                     class="text-decoration-none">
                                                     <?php echo htmlspecialchars($review['location_name']); ?>
                                                 </a>
@@ -185,7 +186,7 @@ include '../../includes/header.php';
                                     <div class="card border">
                                         <div class="card-body p-3">
                                             <h6 class="mb-1">
-                                                <a href="<?php echo BASE_URL; ?>warung/<?php echo $location['location_id']; ?>"
+                                                <a href="<?php echo BASE_URL; ?>kedai/<?php echo $location['location_id']; ?>"
                                                     class="text-decoration-none">
                                                     <?php echo htmlspecialchars($location['name']); ?>
                                                 </a>
@@ -260,11 +261,11 @@ include '../../includes/header.php';
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <a href="<?php echo BASE_URL; ?>warung/add" class="btn btn-outline-primary">
-                            <i class="fas fa-plus-circle me-2"></i>Tambah Warung Baru
+                        <a href="<?php echo BASE_URL; ?>kedai/add" class="btn btn-outline-primary">
+                            <i class="fas fa-plus-circle me-2"></i>Tambah Kedai Baru
                         </a>
-                        <a href="<?php echo BASE_URL; ?>warung" class="btn btn-outline-primary">
-                            <i class="fas fa-search me-2"></i>Cari Warung
+                        <a href="<?php echo BASE_URL; ?>kedai" class="btn btn-outline-primary">
+                            <i class="fas fa-search me-2"></i>Cari Kedai
                         </a>
                         <a href="<?php echo BASE_URL; ?>leaderboard" class="btn btn-outline-primary">
                             <i class="fas fa-trophy me-2"></i>Lihat Leaderboard

@@ -1,13 +1,15 @@
 <?php
 
 
-define('MIE_TIME', true);
+if (!defined('MIE_TIME')) {
+    define('MIE_TIME', true);
+}
 require_once 'config.php';
 require_once 'includes/db.php';
 require_once 'includes/functions.php';
 
 $page_title = 'Beranda';
-$page_description = 'Temukan warung mie ayam terbaik di sekitar Anda';
+$page_description = 'Temukan kedai mie ayam terbaik di sekitar Anda';
 
 // Get featured locations
 $top_locations = get_top_locations(6);
@@ -34,11 +36,11 @@ include 'includes/header.php';
                     <i class="fas fa-bowl-food me-3"></i>Mie Time
                 </h1>
                 <p class="lead mb-4">
-                    Platform komunitas untuk menemukan dan berbagi review warung mie ayam terbaik di Indonesia
+                    Platform komunitas untuk menemukan dan berbagi review kedai mie ayam terbaik di Indonesia
                 </p>
                 <div class="d-grid gap-2 d-md-flex">
-                    <a href="<?php echo BASE_URL; ?>warung" class="btn btn-light btn-lg">
-                        <i class="fas fa-search me-2"></i>Jelajahi Warung
+                    <a href="<?php echo BASE_URL; ?>kedai" class="btn btn-light btn-lg">
+                        <i class="fas fa-search me-2"></i>Cari Mie Ayam
                     </a>
                     <?php if (!is_logged_in()): ?>
                         <a href="<?php echo BASE_URL; ?>register" class="btn btn-outline-light btn-lg">
@@ -46,11 +48,6 @@ include 'includes/header.php';
                         </a>
                     <?php endif; ?>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <img src="<?php echo ASSETS_URL; ?>img/hero-mie.jpg" alt="Mie Ayam"
-                    class="img-fluid rounded shadow"
-                    onerror="this.src='https://via.placeholder.com/600x400/0d6efd/ffffff?text=Mie+Ayam'">
             </div>
         </div>
     </div>
@@ -67,7 +64,7 @@ include 'includes/header.php';
                             <i class="fas fa-search"></i>
                         </span>
                         <input type="text" name="q" class="form-control"
-                            placeholder="Cari warung mie ayam atau lokasi...">
+                            placeholder="Cari kedai mie ayam atau lokasi...">
                         <button type="submit" class="btn btn-primary">Cari</button>
                     </div>
                 </div>
@@ -84,7 +81,7 @@ include 'includes/header.php';
                 <div class="card-body">
                     <i class="fas fa-store fa-3x text-primary mb-3"></i>
                     <h3 class="fw-bold"><?php echo number_format(db_count('locations', 'status = "active"')); ?></h3>
-                    <p class="text-muted mb-0">Warung Terdaftar</p>
+                    <p class="text-muted mb-0">Kedai Terdaftar</p>
                 </div>
             </div>
         </div>
@@ -122,9 +119,9 @@ include 'includes/header.php';
 <div class="container mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">
-            <i class="fas fa-trophy text-warning me-2"></i>Warung Terbaik
+            <i class="fas fa-trophy text-warning me-2"></i>Kedai Terbaik
         </h2>
-        <a href="<?php echo BASE_URL; ?>warung" class="btn btn-outline-primary">
+        <a href="<?php echo BASE_URL; ?>kedai" class="btn btn-outline-primary">
             Lihat Semua <i class="fas fa-arrow-right ms-1"></i>
         </a>
     </div>
@@ -142,7 +139,7 @@ include 'includes/header.php';
                     </div>
                     <div class="card-body">
                         <h5 class="card-title">
-                            <a href="<?php echo BASE_URL; ?>warung/<?php echo $location['location_id']; ?>"
+                            <a href="<?php echo BASE_URL; ?>kedai/<?php echo $location['location_id']; ?>"
                                 class="text-decoration-none text-dark">
                                 <?php echo htmlspecialchars($location['name']); ?>
                             </a>
@@ -161,7 +158,7 @@ include 'includes/header.php';
                         </div>
                     </div>
                     <div class="card-footer bg-white border-0">
-                        <a href="<?php echo BASE_URL; ?>warung/<?php echo $location['location_id']; ?>"
+                        <a href="<?php echo BASE_URL; ?>kedai/<?php echo $location['location_id']; ?>"
                             class="btn btn-outline-primary btn-sm w-100">
                             Lihat Detail
                         </a>
@@ -198,7 +195,7 @@ include 'includes/header.php';
                             </span>
                         </div>
                         <h6 class="mt-2">
-                            <a href="<?php echo BASE_URL; ?>warung/<?php echo $review['location_id']; ?>"
+                            <a href="<?php echo BASE_URL; ?>kedai/<?php echo $review['location_id']; ?>"
                                 class="text-decoration-none">
                                 <?php echo htmlspecialchars($review['location_name']); ?>
                             </a>
@@ -210,7 +207,7 @@ include 'includes/header.php';
                             <span>
                                 <i class="fas fa-thumbs-up me-1"></i><?php echo $review['upvotes']; ?>
                             </span>
-                            <a href="<?php echo BASE_URL; ?>warung/<?php echo $review['location_id']; ?>"
+                            <a href="<?php echo BASE_URL; ?>kedai/<?php echo $review['location_id']; ?>"
                                 class="text-primary text-decoration-none">
                                 Baca Selengkapnya
                             </a>
@@ -225,17 +222,17 @@ include 'includes/header.php';
 <!-- Call to Action -->
 <div class="bg-light py-5">
     <div class="container text-center">
-        <h2 class="fw-bold mb-3">Bergabunglah dengan Komunitas Mie Time</h2>
+        <h2 class="fw-bold mb-3">Yuk gabung ke Komunitas Mie Time !</h2>
         <p class="lead text-muted mb-4">
-            Bagikan pengalaman kuliner Anda dan bantu orang lain menemukan warung mie ayam terbaik
+            Bagikan pengalaman kuliner dan bantu orang lain menemukan mie ayam terbaik
         </p>
         <?php if (!is_logged_in()): ?>
             <a href="<?php echo BASE_URL; ?>register" class="btn btn-primary btn-lg">
                 <i class="fas fa-user-plus me-2"></i>Daftar Gratis
             </a>
         <?php else: ?>
-            <a href="<?php echo BASE_URL; ?>warung/add" class="btn btn-primary btn-lg">
-                <i class="fas fa-plus-circle me-2"></i>Tambah Warung Baru
+            <a href="<?php echo BASE_URL; ?>kedai/add" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus-circle me-2"></i>Tambah Kedai Baru
             </a>
         <?php endif; ?>
     </div>

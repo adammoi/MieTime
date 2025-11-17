@@ -1,7 +1,9 @@
 <?php
 
 
-define('MIE_TIME', true);
+if (!defined('MIE_TIME')) {
+    define('MIE_TIME', true);
+}
 require_once '../../config.php';
 require_once '../../includes/db.php';
 require_once '../../includes/functions.php';
@@ -23,9 +25,9 @@ include '../../includes/header.php';
     <!-- Search Header -->
     <div class="text-center mb-5">
         <h2 class="fw-bold mb-3">
-            <i class="fas fa-search text-primary me-2"></i>Cari Warung Mie Ayam
+            <i class="fas fa-search text-primary me-2"></i>Cari Kedai Mie Ayam
         </h2>
-        <p class="text-muted">Temukan warung mie ayam favorit Anda di seluruh Indonesia</p>
+        <p class="text-muted">Temukan kedai mie ayam favorit Anda di seluruh Indonesia</p>
     </div>
 
     <!-- Search Form -->
@@ -38,7 +40,7 @@ include '../../includes/header.php';
                             <i class="fas fa-search"></i>
                         </span>
                         <input type="text" name="q" class="form-control"
-                            placeholder="Nama warung atau lokasi..."
+                            placeholder="Nama kedai atau lokasi..."
                             value="<?php echo htmlspecialchars($query); ?>"
                             autofocus>
                         <button type="submit" class="btn btn-primary px-4">
@@ -85,7 +87,7 @@ include '../../includes/header.php';
                             <!-- Body -->
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    <a href="<?php echo BASE_URL; ?>warung/<?php echo $location['location_id']; ?>"
+                                    <a href="<?php echo BASE_URL; ?>kedai/<?php echo $location['location_id']; ?>"
                                         class="text-decoration-none text-dark">
                                         <?php echo htmlspecialchars($location['name']); ?>
                                     </a>
@@ -114,7 +116,7 @@ include '../../includes/header.php';
 
                             <!-- Footer -->
                             <div class="card-footer bg-white border-0">
-                                <a href="<?php echo BASE_URL; ?>warung/<?php echo $location['location_id']; ?>"
+                                <a href="<?php echo BASE_URL; ?>kedai/<?php echo $location['location_id']; ?>"
                                     class="btn btn-primary btn-sm w-100">
                                     <i class="fas fa-info-circle me-1"></i>Lihat Detail
                                 </a>
@@ -132,8 +134,8 @@ include '../../includes/header.php';
                 <p class="text-muted mb-4">
                     Coba kata kunci yang berbeda atau lebih umum
                 </p>
-                <a href="<?php echo BASE_URL; ?>warung" class="btn btn-primary">
-                    <i class="fas fa-store me-2"></i>Lihat Semua Warung
+                <a href="<?php echo BASE_URL; ?>kedai" class="btn btn-primary">
+                    <i class="fas fa-store me-2"></i>Lihat Semua Kedai
                 </a>
             </div>
         <?php endif; ?>
@@ -142,8 +144,8 @@ include '../../includes/header.php';
         <!-- Empty State / Popular Locations -->
         <div class="text-center mb-5">
             <i class="fas fa-fire text-warning fa-3x mb-3"></i>
-            <h4 class="fw-bold mb-3">Warung Populer</h4>
-            <p class="text-muted">Belum tahu mau cari apa? Lihat warung-warung populer di bawah ini</p>
+            <h4 class="fw-bold mb-3">Kedai Populer</h4>
+            <p class="text-muted">Belum tahu mau cari apa? Lihat kedai-kedai populer di bawah ini</p>
         </div>
 
         <div class="row">
@@ -166,7 +168,7 @@ include '../../includes/header.php';
 
                         <div class="card-body">
                             <h5 class="card-title">
-                                <a href="<?php echo BASE_URL; ?>warung/<?php echo $location['location_id']; ?>"
+                                <a href="<?php echo BASE_URL; ?>kedai/<?php echo $location['location_id']; ?>"
                                     class="text-decoration-none text-dark">
                                     <?php echo htmlspecialchars($location['name']); ?>
                                 </a>
@@ -187,7 +189,7 @@ include '../../includes/header.php';
                         </div>
 
                         <div class="card-footer bg-white border-0">
-                            <a href="<?php echo BASE_URL; ?>warung/<?php echo $location['location_id']; ?>"
+                            <a href="<?php echo BASE_URL; ?>kedai/<?php echo $location['location_id']; ?>"
                                 class="btn btn-primary btn-sm w-100">
                                 Lihat Detail
                             </a>

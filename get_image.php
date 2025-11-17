@@ -5,7 +5,9 @@
  * Serve images dari folder upload yang di luar web root
  */
 
-define('MIE_TIME', true);
+if (!defined('MIE_TIME')) {
+    define('MIE_TIME', true);
+}
 require_once 'config.php';
 
 // Get requested image path

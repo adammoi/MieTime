@@ -1,89 +1,90 @@
-Mie Time - Form Tambah Warung Baru<?php
-                                    /**
-                                     * Mie Time - Form Tambah Warung Baru
-                                     */
+<?php
 
-                                    define('MIE_TIME', true);
-                                    require_once '../../config.php';
-                                    require_once '../../includes/db.php';
-                                    require_once '../../includes/functions.php';
-                                    require_once '../../includes/auth.php';
 
-                                    // Require login
-                                    require_login();
+if (!defined('MIE_TIME')) {
+    define('MIE_TIME', true);
+}
+require_once '../../config.php';
+require_once '../../includes/db.php';
+require_once '../../includes/functions.php';
+require_once '../../includes/auth.php';
 
-                                    $errors = [];
-                                    $success = false;
+// Require login
+require_login();
+$latitude = $latitude ?? '';
+$longitude = $longitude ?? '';
+$errors = [];
+$success = false;
 
-                                    // Process form submission
-                                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                                        $name = clean_input($_POST['name'] ?? '');
-                                        $address = clean_input($_POST['address'] ?? '');
-                                        $latitude = $_POST['latitude'] ?? '';
-                                        $longitude = $_POST['longitude'] ?? '';
+// Process form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = clean_input($_POST['name'] ?? '');
+    $address = clean_input($_POST['address'] ?? '');
+    $latitude = $_POST['latitude'] ?? '';
+    $longitude = $_POST['longitude'] ?? '';
 
-                                        // Validation
-                                        if (empty($name)) {
-                                            $errors[] = 'Nama warung harus diisi';
-                                        } elseif (strlen($name) < 3) {
-                                            $errors[] = 'Nama warung minimal 3 karakter';
-                                        }
+    // Validation
+    if (empty($name)) {
+        $errors[] = 'Nama kedai harus diisi';
+    } elseif (strlen($name) < 3) {
+        $errors[] = 'Nama kedai minimal 3 karakter';
+    }
 
-                                        if (empty($address)) {
-                                            $errors[] = 'Alamat harus diisi';
-                                        } elseif (strlen($address) < 10) {
-                                            $errors[] = 'Alamat minimal 10 karakter';
-                                        }
+    if (empty($address)) {
+        $errors[] = 'Alamat harus diisi';
+    } elseif (strlen($address) < 10) {
+        $errors[] = 'Alamat minimal 10 karakter';
+    }
 
-                                        if (empty($latitude) || empty($longitude)) {
-                                            $errors[] = 'Lokasi pada peta harus dipilih';
-                                        } elseif (!is_numeric($latitude) || !is_numeric($longitude)) {
-                                            $errors[] = 'Koordinat lokasi tidak valid';
-                                        }
+    if (empty($latitude) || empty($longitude)) {
+        $errors[] = 'Lokasi pada peta harus dipilih';
+    } elseif (!is_numeric($latitude) || !is_numeric($longitude)) {
+        $errors[] = 'Koordinat lokasi tidak valid';
+    }
 
-                                        // Check duplicate
-                                        $duplicate = db_fetch(
-                                            "SELECT location_id FROM locations WHERE name = ? AND address LIKE ?",
-                                            [$name, "%$address%"]
-                                        );
-                                        if ($duplicate) {
-                                            $errors[] = 'Warung dengan nama dan alamat serupa sudah ada';
-                                        }
+    // Check duplicate
+    $duplicate = db_fetch(
+        "SELECT location_id FROM locations WHERE name = ? AND address LIKE ?",
+        [$name, "%$address%"]
+    );
+    if ($duplicate) {
+        $errors[] = 'Kedai dengan nama dan alamat serupa sudah ada';
+    }
 
-                                        // Insert if no errors
-                                        if (empty($errors)) {
-                                            $location_id = db_insert('locations', [
-                                                'name' => $name,
-                                                'address' => $address,
-                                                'latitude' => $latitude,
-                                                'longitude' => $longitude,
-                                                'status' => AUTO_APPROVE_REVIEWS ? 'active' : 'pending_approval'
-                                            ]);
+    // Insert if no errors
+    if (empty($errors)) {
+        $location_id = db_insert('locations', [
+            'name' => $name,
+            'address' => $address,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'status' => AUTO_APPROVE_REVIEWS ? 'active' : 'pending_approval'
+        ]);
 
-                                            if ($location_id) {
-                                                // Award points
-                                                $user = get_user_by_id(get_current_user_id());
-                                                $new_points = $user['points'] + POINTS_PER_LOCATION_ADD;
-                                                update_user_points(get_current_user_id(), $new_points);
+        if ($location_id) {
+            // Award points
+            $user = get_user_by_id(get_current_user_id());
+            $new_points = $user['points'] + POINTS_PER_LOCATION_ADD;
+            update_user_points(get_current_user_id(), $new_points);
 
-                                                // Create notification
-                                                create_notification(
-                                                    get_current_user_id(),
-                                                    "Warung <strong>$name</strong> berhasil ditambahkan! +" . POINTS_PER_LOCATION_ADD . " poin",
-                                                    "warung/$location_id"
-                                                );
+            // Create notification
+            create_notification(
+                get_current_user_id(),
+                "Kedai <strong>$name</strong> berhasil ditambahkan! +" . POINTS_PER_LOCATION_ADD . " poin",
+                "kedai/$location_id"
+            );
 
-                                                set_flash('success', 'Warung berhasil ditambahkan! ' . (AUTO_APPROVE_REVIEWS ? '' : 'Menunggu persetujuan admin.'));
-                                                redirect('warung/' . $location_id);
-                                            } else {
-                                                $errors[] = 'Gagal menambahkan warung. Silakan coba lagi.';
-                                            }
-                                        }
-                                    }
+            set_flash('success', 'Kedai berhasil ditambahkan! ' . (AUTO_APPROVE_REVIEWS ? '' : 'Menunggu persetujuan admin.'));
+            redirect('kedai/' . $location_id);
+        } else {
+            $errors[] = 'Gagal menambahkan kedai. Silakan coba lagi.';
+        }
+    }
+}
 
-                                    $page_title = 'Tambah Warung Baru';
-                                    include '../../includes/header.php';
-                                    ?>
+$page_title = 'Tambah Kedai Baru';
+include '../../includes/header.php';
+?>
 
 <div class="container my-5">
     <div class="row justify-content-center">
@@ -91,10 +92,10 @@ Mie Time - Form Tambah Warung Baru<?php
             <!-- Header -->
             <div class="mb-4">
                 <h2 class="fw-bold">
-                    <i class="fas fa-plus-circle text-primary me-2"></i>Tambah Warung Mie Ayam Baru
+                    <i class="fas fa-plus-circle text-primary me-2"></i>Tambah Kedai Mie Ayam Baru
                 </h2>
                 <p class="text-muted">
-                    Bantu komunitas menemukan warung mie ayam favorit Anda!
+                    Bantu komunitas menemukan kedai mie ayam favorit Anda!
                     Anda akan mendapatkan <strong><?php echo POINTS_PER_LOCATION_ADD; ?> poin</strong>.
                 </p>
             </div>
@@ -119,7 +120,7 @@ Mie Time - Form Tambah Warung Baru<?php
                         <!-- Name -->
                         <div class="mb-4">
                             <label for="name" class="form-label fw-bold">
-                                <i class="fas fa-store text-primary me-2"></i>Nama Warung
+                                <i class="fas fa-store text-primary me-2"></i>Nama Kedai
                                 <span class="text-danger">*</span>
                             </label>
                             <input type="text" class="form-control form-control-lg"
@@ -127,7 +128,7 @@ Mie Time - Form Tambah Warung Baru<?php
                                 placeholder="Contoh: Mie Ayam Pak Sastro"
                                 value="<?php echo htmlspecialchars($name ?? ''); ?>"
                                 required>
-                            <small class="text-muted">Masukkan nama warung yang jelas dan mudah dikenali</small>
+                            <small class="text-muted">Masukkan nama kedai yang jelas dan mudah dikenali</small>
                         </div>
 
                         <!-- Address -->
@@ -196,9 +197,9 @@ Mie Time - Form Tambah Warung Baru<?php
                         <!-- Submit Buttons -->
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
-                                <i class="fas fa-check me-2"></i>Tambah Warung
+                                <i class="fas fa-check me-2"></i>Tambah Kedai
                             </button>
-                            <a href="<?php echo BASE_URL; ?>warung" class="btn btn-outline-secondary btn-lg">
+                            <a href="<?php echo BASE_URL; ?>kedai" class="btn btn-outline-secondary btn-lg">
                                 <i class="fas fa-times me-2"></i>Batal
                             </a>
                         </div>
@@ -209,14 +210,14 @@ Mie Time - Form Tambah Warung Baru<?php
             <!-- Tips Card -->
             <div class="card shadow-sm mt-4">
                 <div class="card-header bg-warning text-dark">
-                    <h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Tips Menambahkan Warung</h6>
+                    <h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Tips Menambahkan Kedai</h6>
                 </div>
                 <div class="card-body">
                     <ul class="mb-0">
-                        <li>Pastikan nama warung benar dan tidak typo</li>
+                        <li>Pastikan nama kedai benar dan tidak typo</li>
                         <li>Alamat harus lengkap agar mudah ditemukan</li>
                         <li>Pilih lokasi di peta seakurat mungkin</li>
-                        <li>Setelah menambah warung, jangan lupa tulis review!</li>
+                        <li>Setelah menambah kedai, jangan lupa tulis review!</li>
                     </ul>
                 </div>
             </div>

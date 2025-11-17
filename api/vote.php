@@ -5,7 +5,9 @@
  * Handle upvote/downvote untuk review
  */
 
-define('MIE_TIME', true);
+if (!defined('MIE_TIME')) {
+    define('MIE_TIME', true);
+}
 require_once '../config.php';
 require_once '../includes/db.php';
 require_once '../includes/functions.php';
@@ -109,7 +111,7 @@ try {
             create_notification(
                 $review['user_id'],
                 "Review Anda mendapat upvote! +" . POINTS_PER_UPVOTE . " poin",
-                "warung/{$review['location_id']}"
+                "kedai/{$review['location_id']}"
             );
         }
 

@@ -1,7 +1,9 @@
 <?php
 
 
-define('MIE_TIME', true);
+if (!defined('MIE_TIME')) {
+    define('MIE_TIME', true);
+}
 require_once '../../config.php';
 require_once '../../includes/db.php';
 require_once '../../includes/functions.php';
@@ -47,7 +49,7 @@ $params[] = ITEMS_PER_PAGE;
 $params[] = $offset;
 $locations = db_fetch_all($sql, $params);
 
-$page_title = 'Daftar Warung';
+$page_title = 'Daftar Kedai';
 include '../../includes/header.php';
 ?>
 
@@ -56,14 +58,14 @@ include '../../includes/header.php';
     <div class="row mb-4">
         <div class="col-md-6">
             <h2 class="fw-bold">
-                <i class="fas fa-store text-primary me-2"></i>Daftar Warung Mie Ayam
+                <i class="fas fa-store text-primary me-2"></i>Daftar Kedai Mie Ayam
             </h2>
-            <p class="text-muted">Temukan <?php echo number_format($total_locations); ?> warung mie ayam terbaik</p>
+            <p class="text-muted">Temukan <?php echo number_format($total_locations); ?> kedai mie ayam terbaik</p>
         </div>
         <div class="col-md-6 text-md-end">
             <?php if (is_logged_in()): ?>
-                <a href="<?php echo BASE_URL; ?>warung/add" class="btn btn-primary">
-                    <i class="fas fa-plus-circle me-2"></i>Tambah Warung Baru
+                <a href="<?php echo BASE_URL; ?>kedai/add" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-2"></i>Tambah Kedai Baru
                 </a>
             <?php endif; ?>
         </div>
@@ -99,7 +101,7 @@ include '../../includes/header.php';
 
                 <div class="col-md-4">
                     <label class="form-label">&nbsp;</label>
-                    <a href="<?php echo BASE_URL; ?>warung" class="btn btn-outline-secondary d-block">
+                    <a href="<?php echo BASE_URL; ?>kedai" class="btn btn-outline-secondary d-block">
                         <i class="fas fa-redo me-2"></i>Reset Filter
                     </a>
                 </div>
@@ -111,7 +113,7 @@ include '../../includes/header.php';
     <?php if (empty($locations)): ?>
         <div class="alert alert-info text-center">
             <i class="fas fa-info-circle me-2"></i>
-            Tidak ada warung yang ditemukan dengan filter ini.
+            Tidak ada kedai yang ditemukan dengan filter ini.
         </div>
     <?php else: ?>
         <div class="row">
@@ -140,7 +142,7 @@ include '../../includes/header.php';
                         <!-- Card Body -->
                         <div class="card-body">
                             <h5 class="card-title">
-                                <a href="<?php echo BASE_URL; ?>warung/<?php echo $location['location_id']; ?>"
+                                <a href="<?php echo BASE_URL; ?>kedai/<?php echo $location['location_id']; ?>"
                                     class="text-decoration-none text-dark">
                                     <?php echo htmlspecialchars($location['name']); ?>
                                 </a>
@@ -170,7 +172,7 @@ include '../../includes/header.php';
 
                         <!-- Card Footer -->
                         <div class="card-footer bg-white border-0 d-flex justify-content-between">
-                            <a href="<?php echo BASE_URL; ?>warung/<?php echo $location['location_id']; ?>"
+                            <a href="<?php echo BASE_URL; ?>kedai/<?php echo $location['location_id']; ?>"
                                 class="btn btn-outline-primary btn-sm flex-grow-1 me-2">
                                 <i class="fas fa-info-circle me-1"></i>Detail
                             </a>
@@ -194,7 +196,7 @@ include '../../includes/header.php';
 
         <!-- Pagination -->
         <?php
-        echo generate_pagination($total_locations, $page, BASE_URL . 'warung?filter=' . $filter . '&min_rating=' . $min_rating . '&');
+        echo generate_pagination($total_locations, $page, BASE_URL . 'kedai?filter=' . $filter . '&min_rating=' . $min_rating . '&');
         ?>
     <?php endif; ?>
 </div>

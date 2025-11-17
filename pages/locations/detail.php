@@ -1,41 +1,41 @@
-Mie Time - Detail Warung<?php
-                        /**
-                         * Mie Time - Detail Warung
-                         */
+<?php
 
-                        define('MIE_TIME', true);
-                        require_once '../../config.php';
-                        require_once '../../includes/db.php';
-                        require_once '../../includes/functions.php';
 
-                        $location_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+if (!defined('MIE_TIME')) {
+    define('MIE_TIME', true);
+}
+require_once '../../config.php';
+require_once '../../includes/db.php';
+require_once '../../includes/functions.php';
 
-                        // Get location
-                        $location = get_location_by_id($location_id);
+$location_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-                        if (!$location) {
-                            set_flash('error', 'Warung tidak ditemukan');
-                            redirect('warung');
-                        }
+// Get location
+$location = get_location_by_id($location_id);
 
-                        // Get reviews
-                        $reviews = get_reviews_by_location($location_id, 'approved');
+if (!$location) {
+    set_flash('error', 'Kedai tidak ditemukan');
+    redirect('kedai');
+}
 
-                        // Check if user has bookmarked
-                        $is_bookmarked = false;
-                        if (is_logged_in()) {
-                            $is_bookmarked = db_exists(
-                                'bookmarks',
-                                'user_id = :user_id AND location_id = :location_id',
-                                ['user_id' => get_current_user_id(), 'location_id' => $location_id]
-                            );
-                        }
+// Get reviews
+$reviews = get_reviews_by_location($location_id, 'approved');
 
-                        $page_title = $location['name'];
-                        $page_description = substr($location['address'], 0, 150);
+// Check if user has bookmarked
+$is_bookmarked = false;
+if (is_logged_in()) {
+    $is_bookmarked = db_exists(
+        'bookmarks',
+        'user_id = :user_id AND location_id = :location_id',
+        ['user_id' => get_current_user_id(), 'location_id' => $location_id]
+    );
+}
 
-                        include '../../includes/header.php';
-                        ?>
+$page_title = $location['name'];
+$page_description = substr($location['address'], 0, 150);
+
+include '../../includes/header.php';
+?>
 
 <div class="container my-5">
     <div class="row">
@@ -83,9 +83,9 @@ Mie Time - Detail Warung<?php
                                 class="btn btn-primary">
                                 <i class="fas fa-star me-2"></i>Tulis Review
                             </a>
-                            <a href="<?php echo BASE_URL; ?>warung/claim/<?php echo $location_id; ?>"
+                            <a href="<?php echo BASE_URL; ?>kedai/claim/<?php echo $location_id; ?>"
                                 class="btn btn-outline-secondary">
-                                <i class="fas fa-building me-2"></i>Klaim Warung Ini
+                                <i class="fas fa-building me-2"></i>Klaim Kedai Ini
                             </a>
                         <?php else: ?>
                             <button type="button" class="btn btn-primary"
@@ -95,8 +95,8 @@ Mie Time - Detail Warung<?php
                             </button>
                             <button type="button" class="btn btn-outline-secondary"
                                 data-require-login
-                                data-action-text="klaim warung ini">
-                                <i class="fas fa-building me-2"></i>Klaim Warung Ini
+                                data-action-text="klaim kedai ini">
+                                <i class="fas fa-building me-2"></i>Klaim Kedai Ini
                             </button>
                         <?php endif; ?>
                     </div>

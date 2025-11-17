@@ -21,7 +21,7 @@ CREATE TABLE users (
     INDEX idx_review_count (review_count DESC)
 ) ENGINE=InnoDB;
 
--- Tabel Locations (Warung Mie)
+-- Tabel Locations (Kedai Mie)
 CREATE TABLE locations (
     location_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,

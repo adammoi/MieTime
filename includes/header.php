@@ -9,17 +9,17 @@ if (!defined('MIE_TIME')) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="<?php echo $page_description ?? 'Platform review dan penemuan warung mie ayam terbaik di Indonesia'; ?>">
+    <meta name="description" content="<?php echo $page_description ?? 'Platform review dan penemuan mie ayam terbaik di Indonesia'; ?>">
     <title><?php echo $page_title ?? 'Mie Time'; ?> - Platform Review Mie Ayam</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?php echo ASSETS_URL; ?>css/bootstrap/bootstrap.min.css" rel="stylesheet">
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>css/fontawesome-free-7.1.0-web/css/all.min.css">
 
     <!-- Leaflet CSS untuk peta -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>css/leaflet/leaflet.css" />
 
     <!-- Custom CSS -->
     <link href="<?php echo ASSETS_URL; ?>css/custom.css" rel="stylesheet">

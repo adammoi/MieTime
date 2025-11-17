@@ -1,6 +1,8 @@
 <?php
 
-define('MIE_TIME', true);
+if (!defined('MIE_TIME')) {
+    define('MIE_TIME', true);
+}
 require_once '../../config.php';
 require_once '../../includes/db.php';
 require_once '../../includes/functions.php';

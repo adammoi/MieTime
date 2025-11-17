@@ -25,10 +25,10 @@ RewriteRule ^login$ pages/auth/login.php [L]
 RewriteRule ^register$ pages/auth/register.php [L]
 RewriteRule ^logout$ pages/auth/logout.php [L]
 
-# Warung routes
-RewriteRule ^warung$ pages/locations/list.php [L,QSA]
-RewriteRule ^warung/([0-9]+)$ pages/locations/detail.php?id=$1 [L,QSA]
-RewriteRule ^warung/add$ pages/locations/add.php [L]
+# Kedai routes
+RewriteRule ^kedai$ pages/locations/list.php [L,QSA]
+RewriteRule ^kedai/([0-9]+)$ pages/locations/detail.php?id=$1 [L,QSA]
+RewriteRule ^kedai/add$ pages/locations/add.php [L]
 
 # User routes
 RewriteRule ^dashboard$ pages/user/dashboard.php [L]
@@ -38,6 +38,9 @@ RewriteRule ^badges$ pages/user/badges.php [L]
 # Other routes
 RewriteRule ^search$ pages/search/index.php [L,QSA]
 RewriteRule ^leaderboard$ pages/leaderboard/index.php [L]
+
+# Admin routes (support /admin and /admin/{page})
 RewriteRule ^admin$ admin/index.php [L]
+RewriteRule ^admin/([A-Za-z0-9_-]+)$ admin/$1.php [L,QSA]
 
 </IfModule>

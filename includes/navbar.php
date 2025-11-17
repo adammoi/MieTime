@@ -27,8 +27,8 @@ if (is_logged_in()) {
             <!-- Left Menu -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="<?php echo BASE_URL; ?>warung">
-                        <i class="fas fa-store me-1"></i>Warung
+                    <a class="nav-link" href="<?php echo BASE_URL; ?>kedai">
+                        <i class="fas fa-store me-1"></i>Kedai
                     </a>
                 </li>
                 <li class="nav-item">
@@ -43,8 +43,8 @@ if (is_logged_in()) {
                 </li>
                 <?php if (is_logged_in()): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo BASE_URL; ?>warung/add">
-                            <i class="fas fa-plus-circle me-1"></i>Tambah Warung
+                        <a class="nav-link" href="<?php echo BASE_URL; ?>kedai/add">
+                            <i class="fas fa-plus-circle me-1"></i>Tambah Kedai
                         </a>
                     </li>
                 <?php endif; ?>
