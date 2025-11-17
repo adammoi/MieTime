@@ -259,17 +259,45 @@ include '../../includes/header.php';
 
 <?php if ($location['latitude'] && $location['longitude']): ?>
     <script>
-        // Initialize Leaflet Map
-        const map = L.map('map').setView([<?php echo $location['latitude']; ?>, <?php echo $location['longitude']; ?>], 15);
+        function initDetailMap() {
+            const lat = <?php echo $location['latitude']; ?>;
+            const lng = <?php echo $location['longitude']; ?>;
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+            const map = L.map('map').setView([lat, lng], 15);
 
-        L.marker([<?php echo $location['latitude']; ?>, <?php echo $location['longitude']; ?>])
-            .addTo(map)
-            .bindPopup('<strong><?php echo htmlspecialchars($location['name']); ?></strong><br><?php echo htmlspecialchars($location['address']); ?>')
-            .openPopup();
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // FontAwesome divIcon marker helper (keeps marker visible without image assets)
+            const faIconHtml = '<i class="fas fa-map-marker-alt" style="color:#d00;font-size:28px;line-height:28px;"></i>';
+            function createMapMarker(lat, lng) {
+                const icon = L.divIcon({
+                    className: 'fa-map-marker-divicon',
+                    html: faIconHtml,
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 28]
+                });
+                return L.marker([lat, lng], { icon: icon }).addTo(map);
+            }
+
+            const marker = createMapMarker(lat, lng);
+            marker.bindPopup('<strong><?php echo addslashes(htmlspecialchars($location['name'])); ?></strong><br><?php echo addslashes(htmlspecialchars($location['address'])); ?>').openPopup();
+        }
+
+        window.addEventListener('load', function() {
+            if (typeof L === 'undefined') {
+                setTimeout(function() {
+                    if (typeof L !== 'undefined') {
+                        initDetailMap();
+                    } else {
+                        console.error('Leaflet not available for detail map');
+                    }
+                }, 250);
+            } else {
+                initDetailMap();
+            }
+        });
     </script>
 <?php endif; ?>
 

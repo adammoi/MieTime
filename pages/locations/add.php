@@ -226,128 +226,157 @@ include '../../includes/header.php';
 </div>
 
 <script>
-    // Initialize map centered at Surabaya, Indonesia
-    const defaultLat = -7.2575;
-    const defaultLng = 112.7521;
-    let currentMarker = null;
+    // Wrap map logic in a function and run after window load so Leaflet is available
+    function initAddLocationMap() {
+        // Initialize map centered at Surabaya, Indonesia
+        const defaultLat = -7.2575;
+        const defaultLng = 112.7521;
+        let currentMarker = null;
 
-    const map = L.map('map').setView([<?php echo $latitude ?: 'defaultLat'; ?>, <?php echo $longitude ?: 'defaultLng'; ?>], 13);
+        const map = L.map('map').setView([<?php echo $latitude ?: 'defaultLat'; ?>, <?php echo $longitude ?: 'defaultLng'; ?>], 13);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 19
-    }).addTo(map);
-
-    // Add existing marker if editing
-    <?php if (!empty($latitude) && !empty($longitude)): ?>
-        currentMarker = L.marker([<?php echo $latitude; ?>, <?php echo $longitude; ?>], {
-            draggable: true
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
         }).addTo(map);
-        setupMarker(currentMarker);
-    <?php endif; ?>
 
-    // Click on map to add marker
-    map.on('click', function(e) {
-        const lat = e.latlng.lat;
-        const lng = e.latlng.lng;
+        // Helper to create a marker using a FontAwesome divIcon (avoids external image assets)
+        const faIconHtml = '<i class="fas fa-map-marker-alt" style="color:#d00;font-size:28px;line-height:28px;"></i>';
 
-        if (currentMarker) {
-            map.removeLayer(currentMarker);
+        function createMapMarker(lat, lng) {
+            const icon = L.divIcon({
+                className: 'fa-map-marker-divicon',
+                html: faIconHtml,
+                iconSize: [28, 28],
+                iconAnchor: [14, 28]
+            });
+            return L.marker([lat, lng], {
+                icon: icon,
+                draggable: true
+            }).addTo(map);
         }
 
-        currentMarker = L.marker([lat, lng], {
-            draggable: true
-        }).addTo(map);
+        // Add existing marker if editing
+        <?php if (!empty($latitude) && !empty($longitude)): ?>
+            currentMarker = createMapMarker(<?php echo $latitude; ?>, <?php echo $longitude; ?>);
+            setupMarker(currentMarker);
+        <?php endif; ?>
 
-        setupMarker(currentMarker);
-        updateCoordinates(lat, lng);
-    });
+        // Click on map to add marker
+        map.on('click', function(e) {
+            const lat = e.latlng.lat;
+            const lng = e.latlng.lng;
 
-    // Setup marker drag event
-    function setupMarker(marker) {
-        marker.on('dragend', function(e) {
-            const position = e.target.getLatLng();
-            updateCoordinates(position.lat, position.lng);
+            if (currentMarker) {
+                map.removeLayer(currentMarker);
+            }
+
+            currentMarker = createMapMarker(lat, lng);
+
+            setupMarker(currentMarker);
+            updateCoordinates(lat, lng);
+        });
+
+        // Setup marker drag event
+        function setupMarker(marker) {
+            marker.on('dragend', function(e) {
+                const position = e.target.getLatLng();
+                updateCoordinates(position.lat, position.lng);
+            });
+        }
+
+        // Update hidden inputs and display
+        function updateCoordinates(lat, lng) {
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+            document.getElementById('coordDisplay').textContent = lat.toFixed(6) + ', ' + lng.toFixed(6);
+        }
+
+        // Search address using Nominatim (OpenStreetMap)
+        document.getElementById('searchBtn').addEventListener('click', function() {
+            const address = document.getElementById('searchAddress').value;
+
+            if (!address) {
+                alert('Masukkan alamat terlebih dahulu');
+                return;
+            }
+
+            // Show loading
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mencari...';
+
+            // Nominatim API
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+                .then(response => response.json())
+                .then(data => {
+                    this.disabled = false;
+                    this.innerHTML = 'Cari';
+
+                    if (data.length > 0) {
+                        const lat = parseFloat(data[0].lat);
+                        const lng = parseFloat(data[0].lon);
+
+                        // Move map to location
+                        map.setView([lat, lng], 16);
+
+                        // Add marker
+                        if (currentMarker) {
+                            map.removeLayer(currentMarker);
+                        }
+
+                        currentMarker = createMapMarker(lat, lng);
+
+                        setupMarker(currentMarker);
+                        updateCoordinates(lat, lng);
+
+                        // Popup
+                        currentMarker.bindPopup(data[0].display_name).openPopup();
+                    } else {
+                        alert('Alamat tidak ditemukan. Coba dengan kata kunci yang lebih spesifik atau klik langsung pada peta.');
+                    }
+                })
+                .catch(error => {
+                    this.disabled = false;
+                    this.innerHTML = 'Cari';
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat mencari lokasi');
+                });
+        });
+
+        // Allow Enter key to search
+        document.getElementById('searchAddress').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('searchBtn').click();
+            }
+        });
+
+        // Form validation
+        document.getElementById('addLocationForm').addEventListener('submit', function(e) {
+            const lat = document.getElementById('latitude').value;
+            const lng = document.getElementById('longitude').value;
+
+            if (!lat || !lng) {
+                e.preventDefault();
+                alert('Silakan pilih lokasi pada peta terlebih dahulu');
+                return false;
+            }
         });
     }
 
-    // Update hidden inputs and display
-    function updateCoordinates(lat, lng) {
-        document.getElementById('latitude').value = lat;
-        document.getElementById('longitude').value = lng;
-        document.getElementById('coordDisplay').textContent = lat.toFixed(6) + ', ' + lng.toFixed(6);
-    }
-
-    // Search address using Nominatim (OpenStreetMap)
-    document.getElementById('searchBtn').addEventListener('click', function() {
-        const address = document.getElementById('searchAddress').value;
-
-        if (!address) {
-            alert('Masukkan alamat terlebih dahulu');
-            return;
-        }
-
-        // Show loading
-        this.disabled = true;
-        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mencari...';
-
-        // Nominatim API
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
-            .then(response => response.json())
-            .then(data => {
-                this.disabled = false;
-                this.innerHTML = 'Cari';
-
-                if (data.length > 0) {
-                    const lat = parseFloat(data[0].lat);
-                    const lng = parseFloat(data[0].lon);
-
-                    // Move map to location
-                    map.setView([lat, lng], 16);
-
-                    // Add marker
-                    if (currentMarker) {
-                        map.removeLayer(currentMarker);
-                    }
-
-                    currentMarker = L.marker([lat, lng], {
-                        draggable: true
-                    }).addTo(map);
-
-                    setupMarker(currentMarker);
-                    updateCoordinates(lat, lng);
-
-                    // Popup
-                    currentMarker.bindPopup(data[0].display_name).openPopup();
+    // Run after all resources (including footer scripts) are loaded
+    window.addEventListener('load', function() {
+        if (typeof L === 'undefined') {
+            // Leaflet not loaded yet; try again shortly
+            setTimeout(function() {
+                if (typeof L !== 'undefined') {
+                    initAddLocationMap();
                 } else {
-                    alert('Alamat tidak ditemukan. Coba dengan kata kunci yang lebih spesifik atau klik langsung pada peta.');
+                    console.error('Leaflet library is not available.');
                 }
-            })
-            .catch(error => {
-                this.disabled = false;
-                this.innerHTML = 'Cari';
-                console.error('Error:', error);
-                alert('Terjadi kesalahan saat mencari lokasi');
-            });
-    });
-
-    // Allow Enter key to search
-    document.getElementById('searchAddress').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            document.getElementById('searchBtn').click();
-        }
-    });
-
-    // Form validation
-    document.getElementById('addLocationForm').addEventListener('submit', function(e) {
-        const lat = document.getElementById('latitude').value;
-        const lng = document.getElementById('longitude').value;
-
-        if (!lat || !lng) {
-            e.preventDefault();
-            alert('Silakan pilih lokasi pada peta terlebih dahulu');
-            return false;
+            }, 250);
+        } else {
+            initAddLocationMap();
         }
     });
 </script>
