@@ -310,6 +310,19 @@ html {
   font-family: inherit;
 }
 
+/* Marker tweaks for FontAwesome divIcon markers used by the app */
+.fa-map-marker-divicon {
+  pointer-events: auto; /* allow popup interactions */
+  text-align: center;
+}
+.fa-map-marker-divicon i {
+  transform: translateY(-6px); /* lift icon so tip points correctly */
+  font-size: 28px;
+  line-height: 28px;
+  color: #d00;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+}
+
 /* ==================== DROPDOWN MENUS ==================== */
 .dropdown-menu {
   border-radius: 12px;
