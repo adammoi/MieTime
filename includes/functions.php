@@ -504,38 +504,66 @@ function upload_review_image($file, $review_id)
 
     $destination = $upload_dir . $new_filename;
 
-    // Image laundering dengan GD
-    $image = null;
-    switch ($file['type']) {
-        case 'image/jpeg':
-        case 'image/jpg':
-            $image = imagecreatefromjpeg($file['tmp_name']);
-            break;
-        case 'image/png':
-            $image = imagecreatefrompng($file['tmp_name']);
-            break;
+    // Image laundering with GD if available, otherwise fall back to moving the uploaded file
+    $saved = false;
+    $ext = strtolower($ext);
+
+    // Try GD processing when functions are available
+    if ((($file['type'] === 'image/jpeg' || $file['type'] === 'image/jpg') && function_exists('imagecreatefromjpeg'))
+        || ($file['type'] === 'image/png' && function_exists('imagecreatefrompng'))
+    ) {
+        $image = null;
+        if ($file['type'] === 'image/jpeg' || $file['type'] === 'image/jpg') {
+            if (function_exists('imagecreatefromjpeg')) {
+                $image = @imagecreatefromjpeg($file['tmp_name']);
+            }
+        } elseif ($file['type'] === 'image/png') {
+            if (function_exists('imagecreatefrompng')) {
+                $image = @imagecreatefrompng($file['tmp_name']);
+            }
+        }
+
+        if ($image) {
+            // Resize if too large
+            $width = imagesx($image);
+            $height = imagesy($image);
+            $max_width = 1200;
+
+            if ($width > $max_width) {
+                $new_width = $max_width;
+                $new_height = ($height / $width) * $new_width;
+                $resized = imagecreatetruecolor($new_width, $new_height);
+                imagecopyresampled($resized, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+                imagedestroy($image);
+                $image = $resized;
+            }
+
+            // Save laundered image as JPEG for consistent quality
+            $new_filename = $hash . '.jpg';
+            $destination = $upload_dir . $new_filename;
+            imagejpeg($image, $destination, 90);
+            imagedestroy($image);
+            $saved = true;
+        }
     }
 
-    if (!$image) {
+    // Fallback: move the original uploaded file if GD not available or processing failed
+    if (!$saved) {
+        if (is_uploaded_file($file['tmp_name'])) {
+            if (@move_uploaded_file($file['tmp_name'], $destination)) {
+                $saved = true;
+            }
+        } else {
+            // Try a direct copy as a last resort
+            if (@copy($file['tmp_name'], $destination)) {
+                $saved = true;
+            }
+        }
+    }
+
+    if (!$saved) {
         return ['success' => false, 'error' => 'Gagal memproses gambar'];
     }
-
-    // Resize if too large
-    $width = imagesx($image);
-    $height = imagesy($image);
-    $max_width = 1200;
-
-    if ($width > $max_width) {
-        $new_width = $max_width;
-        $new_height = ($height / $width) * $new_width;
-        $resized = imagecreatetruecolor($new_width, $new_height);
-        imagecopyresampled($resized, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
-        $image = $resized;
-    }
-
-    // Save laundered image
-    imagejpeg($image, $destination, 90);
-    imagedestroy($image);
 
     // Save to database
     $result = db_insert('review_images', [

@@ -1,157 +1,155 @@
-Mie Time - Form Tambah Review<?php
-                                /**
-                                 * Mie Time - Form Tambah Review
-                                 */
+<?php
 
-                                if (!defined('MIE_TIME')) {
-                                    define('MIE_TIME', true);
-                                }
-                                require_once '../../config.php';
-                                require_once '../../includes/db.php';
-                                require_once '../../includes/functions.php';
-                                require_once '../../includes/auth.php';
 
-                                // Require login
-                                require_login();
+if (!defined('MIE_TIME')) {
+    define('MIE_TIME', true);
+}
+require_once '../../config.php';
+require_once '../../includes/db.php';
+require_once '../../includes/functions.php';
+require_once '../../includes/auth.php';
 
-                                $location_id = isset($_GET['location_id']) ? (int)$_GET['location_id'] : 0;
+// Require login
+require_login();
 
-                                // Get location
-                                $location = get_location_by_id($location_id);
-                                if (!$location) {
-                                    set_flash('error', 'Kedai tidak ditemukan');
-                                    redirect('kedai');
-                                }
+$location_id = isset($_GET['location_id']) ? (int)$_GET['location_id'] : 0;
 
-                                $errors = [];
+// Get location
+$location = get_location_by_id($location_id);
+if (!$location) {
+    set_flash('error', 'Kedai tidak ditemukan');
+    redirect('kedai');
+}
 
-                                // Process form submission
-                                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                                    $rating = isset($_POST['rating']) ? (int)$_POST['rating'] : 0;
-                                    $review_text = clean_input($_POST['review_text'] ?? '');
+$errors = [];
 
-                                    // Validation
-                                    if ($rating < 1 || $rating > 5) {
-                                        $errors[] = 'Rating harus antara 1-5 bintang';
-                                    }
+// Process form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $rating = isset($_POST['rating']) ? (int)$_POST['rating'] : 0;
+    $review_text = clean_input($_POST['review_text'] ?? '');
 
-                                    if (empty($review_text)) {
-                                        $errors[] = 'Review tidak boleh kosong';
-                                    } elseif (strlen($review_text) < 20) {
-                                        $errors[] = 'Review minimal 20 karakter';
-                                    } elseif (strlen($review_text) > 1000) {
-                                        $errors[] = 'Review maksimal 1000 karakter';
-                                    }
+    // Validation
+    if ($rating < 1 || $rating > 5) {
+        $errors[] = 'Rating harus antara 1-5 bintang';
+    }
 
-                                    // Check if user already reviewed
-                                    $existing = db_fetch(
-                                        "SELECT review_id FROM reviews WHERE location_id = ? AND user_id = ?",
-                                        [$location_id, get_current_user_id()]
-                                    );
-                                    if ($existing) {
-                                        $errors[] = 'Anda sudah pernah me-review kedai ini';
-                                    }
+    if (empty($review_text)) {
+        $errors[] = 'Review tidak boleh kosong';
+    } elseif (strlen($review_text) < 20) {
+        $errors[] = 'Review minimal 20 karakter';
+    } elseif (strlen($review_text) > 1000) {
+        $errors[] = 'Review maksimal 1000 karakter';
+    }
 
-                                    // Auto moderation
-                                    $moderation = auto_moderate_review($review_text);
-                                    $status = 'approved';
-                                    $moderation_reason = null;
+    // Check if user already reviewed
+    $existing = db_fetch(
+        "SELECT review_id FROM reviews WHERE location_id = ? AND user_id = ?",
+        [$location_id, get_current_user_id()]
+    );
+    if ($existing) {
+        $errors[] = 'Anda sudah pernah me-review kedai ini';
+    }
 
-                                    // Check new user (trial period)
-                                    $user = get_user_by_id(get_current_user_id());
-                                    if ($user['review_count'] < NEW_USER_REVIEW_THRESHOLD) {
-                                        $status = 'pending';
-                                        $moderation_reason = 'New user - under review';
-                                    }
+    // Auto moderation
+    $moderation = auto_moderate_review($review_text);
+    $status = 'approved';
+    $moderation_reason = null;
 
-                                    // Check moderation flags
-                                    if ($moderation['flagged']) {
-                                        $status = 'pending';
-                                        $moderation_reason = implode(', ', $moderation['reasons']);
-                                    }
+    // Check new user (trial period)
+    $user = get_user_by_id(get_current_user_id());
+    if ($user['review_count'] < NEW_USER_REVIEW_THRESHOLD) {
+        $status = 'pending';
+        $moderation_reason = 'New user - under review';
+    }
 
-                                    // Insert if no errors
-                                    if (empty($errors)) {
-                                        db_begin_transaction();
+    // Check moderation flags
+    if ($moderation['flagged']) {
+        $status = 'pending';
+        $moderation_reason = implode(', ', $moderation['reasons']);
+    }
 
-                                        try {
-                                            // Insert review
-                                            $review_id = db_insert('reviews', [
-                                                'location_id' => $location_id,
-                                                'user_id' => get_current_user_id(),
-                                                'rating' => $rating,
-                                                'review_text' => $review_text,
-                                                'status' => $status,
-                                                'moderation_reason' => $moderation_reason
-                                            ]);
+    // Insert if no errors
+    if (empty($errors)) {
+        db_begin_transaction();
 
-                                            if (!$review_id) {
-                                                throw new Exception('Failed to insert review');
-                                            }
+        try {
+            // Insert review
+            $review_id = db_insert('reviews', [
+                'location_id' => $location_id,
+                'user_id' => get_current_user_id(),
+                'rating' => $rating,
+                'review_text' => $review_text,
+                'status' => $status,
+                'moderation_reason' => $moderation_reason
+            ]);
 
-                                            // Process image uploads
-                                            if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
-                                                $upload_count = 0;
+            if (!$review_id) {
+                throw new Exception('Failed to insert review');
+            }
 
-                                                foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
-                                                    if ($upload_count >= MAX_IMAGES_PER_REVIEW) break;
+            // Process image uploads
+            if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
+                $upload_count = 0;
 
-                                                    if ($_FILES['images']['error'][$key] === UPLOAD_ERR_OK) {
-                                                        $file = [
-                                                            'name' => $_FILES['images']['name'][$key],
-                                                            'type' => $_FILES['images']['type'][$key],
-                                                            'tmp_name' => $tmp_name,
-                                                            'error' => $_FILES['images']['error'][$key],
-                                                            'size' => $_FILES['images']['size'][$key]
-                                                        ];
+                foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
+                    if ($upload_count >= MAX_IMAGES_PER_REVIEW) break;
 
-                                                        $upload_result = upload_review_image($file, $review_id);
-                                                        if ($upload_result['success']) {
-                                                            $upload_count++;
-                                                        }
-                                                    }
-                                                }
+                    if ($_FILES['images']['error'][$key] === UPLOAD_ERR_OK) {
+                        $file = [
+                            'name' => $_FILES['images']['name'][$key],
+                            'type' => $_FILES['images']['type'][$key],
+                            'tmp_name' => $tmp_name,
+                            'error' => $_FILES['images']['error'][$key],
+                            'size' => $_FILES['images']['size'][$key]
+                        ];
 
-                                                // Award badge for first photo
-                                                if ($upload_count > 0 && $user['review_count'] == 0) {
-                                                    award_badge(get_current_user_id(), 2); // Fotografer Mie badge
-                                                }
-                                            }
+                        $upload_result = upload_review_image($file, $review_id);
+                        if ($upload_result['success']) {
+                            $upload_count++;
+                        }
+                    }
+                }
 
-                                            // Update user review count
-                                            increment_review_count(get_current_user_id());
+                // Award badge for first photo
+                if ($upload_count > 0 && $user['review_count'] == 0) {
+                    award_badge(get_current_user_id(), 2); // Fotografer Mie badge
+                }
+            }
 
-                                            // Award points
-                                            $new_points = $user['points'] + POINTS_PER_REVIEW;
-                                            update_user_points(get_current_user_id(), $new_points);
+            // Update user review count
+            increment_review_count(get_current_user_id());
 
-                                            // Check and award badges
-                                            check_and_award_badges(get_current_user_id());
+            // Award points
+            $new_points = $user['points'] + POINTS_PER_REVIEW;
+            update_user_points(get_current_user_id(), $new_points);
 
-                                            // Create notification
-                                            $notif_msg = $status === 'approved'
-                                                ? "Review Anda di <strong>{$location['name']}</strong> telah dipublikasikan! +" . POINTS_PER_REVIEW . " poin"
-                                                : "Review Anda di <strong>{$location['name']}</strong> sedang ditinjau moderator";
+            // Check and award badges
+            check_and_award_badges(get_current_user_id());
 
-                                            create_notification(get_current_user_id(), $notif_msg, "kedai/$location_id");
+            // Create notification
+            $notif_msg = $status === 'approved'
+                ? "Review Anda di <strong>{$location['name']}</strong> telah dipublikasikan! +" . POINTS_PER_REVIEW . " poin"
+                : "Review Anda di <strong>{$location['name']}</strong> sedang ditinjau moderator";
 
-                                            db_commit();
+            create_notification(get_current_user_id(), $notif_msg, "kedai/$location_id");
 
-                                            set_flash('success', $status === 'approved'
-                                                ? 'Review berhasil dipublikasikan! Terima kasih atas kontribusinya.'
-                                                : 'Review Anda sedang ditinjau oleh moderator. Terima kasih!');
+            db_commit();
 
-                                            redirect('kedai/' . $location_id);
-                                        } catch (Exception $e) {
-                                            db_rollback();
-                                            $errors[] = 'Terjadi kesalahan saat menyimpan review: ' . $e->getMessage();
-                                        }
-                                    }
-                                }
+            set_flash('success', $status === 'approved'
+                ? 'Review berhasil dipublikasikan! Terima kasih atas kontribusinya.'
+                : 'Review Anda sedang ditinjau oleh moderator. Terima kasih!');
 
-                                $page_title = 'Tulis Review - ' . $location['name'];
-                                include '../../includes/header.php';
-                                ?>
+            redirect('kedai/' . $location_id);
+        } catch (Exception $e) {
+            db_rollback();
+            $errors[] = 'Terjadi kesalahan saat menyimpan review: ' . $e->getMessage();
+        }
+    }
+}
+
+$page_title = 'Tulis Review - ' . $location['name'];
+include '../../includes/header.php';
+?>
 
 <div class="container my-5">
     <div class="row justify-content-center">

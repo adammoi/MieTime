@@ -30,6 +30,12 @@ RewriteRule ^kedai$ pages/locations/list.php [L,QSA]
 RewriteRule ^kedai/([0-9]+)$ pages/locations/detail.php?id=$1 [L,QSA]
 RewriteRule ^kedai/add$ pages/locations/add.php [L]
 
+# Reviews routes (support both plural and singular forms)
+RewriteRule ^reviews/add/([0-9]+)$ pages/reviews/add.php?location_id=$1 [L,QSA]
+RewriteRule ^reviews/add$ pages/reviews/add.php [L,QSA]
+RewriteRule ^review/add/([0-9]+)$ pages/reviews/add.php?location_id=$1 [L,QSA]
+RewriteRule ^review/add$ pages/reviews/add.php [L,QSA]
+
 # User routes
 RewriteRule ^dashboard$ pages/user/dashboard.php [L]
 RewriteRule ^profile$ pages/user/profile.php [L]

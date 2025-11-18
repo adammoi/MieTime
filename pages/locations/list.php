@@ -122,7 +122,19 @@ include '../../includes/header.php';
                     <div class="card h-100 shadow-sm hover-card">
                         <!-- Image -->
                         <div class="position-relative" style="height: 200px; overflow: hidden;">
-                            <img src="https://via.placeholder.com/400x200/6c757d/ffffff?text=<?php echo urlencode($location['name']); ?>"
+                            <?php
+                            // Try to fetch a review image for this location. Prefer images from the most-upvoted review.
+                            $reviewImage = db_fetch(
+                                "SELECT ri.* FROM review_images ri JOIN reviews r ON ri.review_id = r.review_id WHERE r.location_id = ? AND ri.file_path IS NOT NULL ORDER BY r.upvotes DESC, r.created_at DESC LIMIT 1",
+                                [$location['location_id']]
+                            );
+                            if ($reviewImage && !empty($reviewImage['file_path'])) {
+                                $imgSrc = BASE_URL . 'get_image.php?path=' . urlencode($reviewImage['file_path']);
+                            } else {
+                                $imgSrc = 'https://via.placeholder.com/400x200/6c757d/ffffff?text=' . urlencode($location['name']);
+                            }
+                            ?>
+                            <img src="<?php echo $imgSrc; ?>"
                                 class="card-img-top w-100 h-100" style="object-fit: cover;"
                                 alt="<?php echo htmlspecialchars($location['name']); ?>">
 

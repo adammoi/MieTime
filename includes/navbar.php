@@ -155,8 +155,22 @@ if (is_logged_in()) {
 
         function fetchNotifications() {
             fetch('<?php echo BASE_URL; ?>api/notifications.php')
-                .then(response => response.json())
-                .then(data => {
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.text();
+                })
+                .then(text => {
+                    let data = {
+                        notifications: [],
+                        unread_count: 0
+                    };
+                    if (text && text.trim() !== '') {
+                        try {
+                            data = JSON.parse(text);
+                        } catch (e) {
+                            console.warn('Notifications response not JSON', e);
+                        }
+                    }
                     const list = document.getElementById('notificationList');
                     if (!list) return;
 

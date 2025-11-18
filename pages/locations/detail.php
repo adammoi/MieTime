@@ -192,9 +192,16 @@ include '../../includes/header.php';
                                     <?php endif; ?>
 
                                     <?php if (is_logged_in() && (get_current_user_id() == $review['user_id'] || is_admin_or_moderator())): ?>
-                                        <button class="btn btn-sm btn-outline-secondary ms-auto">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </button>
+                                        <div class="dropdown ms-auto">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="reviewMenu<?php echo (int)$review['review_id']; ?>" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="reviewMenu<?php echo (int)$review['review_id']; ?>">
+                                                <li>
+                                                    <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/reviews/edit.php?review_id=<?php echo (int)$review['review_id']; ?>">Edit</a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -271,6 +278,7 @@ include '../../includes/header.php';
 
             // FontAwesome divIcon marker helper (keeps marker visible without image assets)
             const faIconHtml = '<i class="fas fa-map-marker-alt" style="color:#d00;font-size:28px;line-height:28px;"></i>';
+
             function createMapMarker(lat, lng) {
                 const icon = L.divIcon({
                     className: 'fa-map-marker-divicon',
@@ -278,7 +286,9 @@ include '../../includes/header.php';
                     iconSize: [28, 28],
                     iconAnchor: [14, 28]
                 });
-                return L.marker([lat, lng], { icon: icon }).addTo(map);
+                return L.marker([lat, lng], {
+                    icon: icon
+                }).addTo(map);
             }
 
             const marker = createMapMarker(lat, lng);

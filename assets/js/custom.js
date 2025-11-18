@@ -12,7 +12,18 @@ document.addEventListener("DOMContentLoaded", function () {
   initScrollToTop();
 
   // Add fade-in animation to cards
-  animateCards();
+  // Respect user's reduced motion preference: only animate if allowed
+  try {
+    var prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+  } catch (e) {
+    var prefersReduced = false;
+  }
+
+  if (!prefersReduced) {
+    animateCards();
+  }
 
   // Initialize image lazy loading
   initLazyLoad();
@@ -43,7 +54,11 @@ function initScrollToTop() {
     btn.addEventListener("click", function () {
       window.scrollTo({
         top: 0,
-        behavior: "smooth",
+        behavior:
+          window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches
+            ? "auto"
+            : "smooth",
       });
     });
   }
