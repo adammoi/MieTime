@@ -217,6 +217,22 @@ END//
 
 DELIMITER ;
 
+-- Tabel Location Claims (untuk klaim kepemilikan kedai)
+CREATE TABLE location_claims (
+    claim_id INT AUTO_INCREMENT PRIMARY KEY,
+    location_id INT NOT NULL,
+    user_id INT NOT NULL,
+    verification_type ENUM('document', 'phone', 'email') NOT NULL,
+    document_path VARCHAR(255) DEFAULT NULL,
+    notes TEXT,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    admin_notes TEXT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (location_id) REFERENCES locations(location_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Insert Admin Default (password: admin123)
 INSERT INTO users (username, email, password_hash, role) VALUES
 ('admin', 'admin@mietime.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');

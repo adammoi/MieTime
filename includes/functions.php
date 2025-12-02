@@ -271,7 +271,8 @@ function award_badge($user_id, $badge_id)
 
     $result = db_insert('user_badges', [
         'user_id' => $user_id,
-        'badge_id' => $badge_id
+        'badge_id' => $badge_id,
+        'earned_at' => date('Y-m-d H:i:s')
     ]);
 
     if ($result) {
@@ -285,6 +286,30 @@ function award_badge($user_id, $badge_id)
     }
 
     return $result;
+}
+
+/**
+ * Auto-assign role-based badges
+ * Call this when user role changes
+ */
+function assign_role_badge($user_id)
+{
+    $user = get_user_by_id($user_id);
+    if (!$user) return;
+
+    // Get role badge based on role
+    $role_badges = [
+        'admin' => 'Admin Badge',
+        'moderator' => 'Moderator Badge',
+        'verified_owner' => 'Verified Owner'
+    ];
+
+    if (isset($role_badges[$user['role']])) {
+        $badge = db_fetch("SELECT badge_id FROM badges WHERE badge_name = ? LIMIT 1", [$role_badges[$user['role']]]);
+        if ($badge && !has_badge($user_id, $badge['badge_id'])) {
+            award_badge($user_id, $badge['badge_id']);
+        }
+    }
 }
 
 /**
@@ -590,25 +615,219 @@ function generate_pagination($total_items, $current_page, $base_url, $items_per_
 
     if ($total_pages <= 1) return '';
 
-    $html = '<nav><ul class="pagination justify-content-center">';
+    $html = '<nav class="flex justify-center"><ul class="flex space-x-2">';
 
     // Previous button
     if ($current_page > 1) {
-        $html .= '<li class="page-item"><a class="page-link" href="' . $base_url . '?page=' . ($current_page - 1) . '">Previous</a></li>';
+        $html .= '<li><a href="' . $base_url . 'page=' . ($current_page - 1) . '" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition text-gray-700 font-medium">Previous</a></li>';
     }
 
     // Page numbers
     for ($i = 1; $i <= $total_pages; $i++) {
-        $active = ($i == $current_page) ? 'active' : '';
-        $html .= '<li class="page-item ' . $active . '"><a class="page-link" href="' . $base_url . '?page=' . $i . '">' . $i . '</a></li>';
+        $active_class = ($i == $current_page) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50';
+        $html .= '<li><a href="' . $base_url . 'page=' . $i . '" class="px-4 py-2 border rounded-lg transition font-medium ' . $active_class . '">' . $i . '</a></li>';
     }
 
     // Next button
     if ($current_page < $total_pages) {
-        $html .= '<li class="page-item"><a class="page-link" href="' . $base_url . '?page=' . ($current_page + 1) . '">Next</a></li>';
+        $html .= '<li><a href="' . $base_url . 'page=' . ($current_page + 1) . '" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition text-gray-700 font-medium">Next</a></li>';
     }
 
     $html .= '</ul></nav>';
 
     return $html;
+}
+
+// ==================== RATE LIMITING ====================
+
+/**
+ * Check rate limit for API requests
+ * @param string $key Unique identifier (e.g., 'api_vote_' . $user_id)
+ * @param int $max_requests Maximum requests allowed
+ * @param int $time_window Time window in seconds
+ * @return bool True if allowed, false if rate limit exceeded
+ */
+function check_rate_limit($key, $max_requests = 10, $time_window = 60)
+{
+    // Use session for simple rate limiting (production should use Redis/Memcached)
+    if (!isset($_SESSION['rate_limit'])) {
+        $_SESSION['rate_limit'] = [];
+    }
+
+    $now = time();
+    $rate_key = 'rl_' . $key;
+
+    // Clean old entries
+    if (isset($_SESSION['rate_limit'][$rate_key])) {
+        $_SESSION['rate_limit'][$rate_key] = array_filter(
+            $_SESSION['rate_limit'][$rate_key],
+            function ($timestamp) use ($now, $time_window) {
+                return ($now - $timestamp) < $time_window;
+            }
+        );
+    } else {
+        $_SESSION['rate_limit'][$rate_key] = [];
+    }
+
+    // Check if limit exceeded
+    if (count($_SESSION['rate_limit'][$rate_key]) >= $max_requests) {
+        return false;
+    }
+
+    // Add current request
+    $_SESSION['rate_limit'][$rate_key][] = $now;
+    return true;
+}
+
+/**
+ * Get remaining rate limit info
+ */
+function get_rate_limit_info($key, $max_requests = 10, $time_window = 60)
+{
+    if (!isset($_SESSION['rate_limit'])) {
+        return ['remaining' => $max_requests, 'reset_in' => 0];
+    }
+
+    $rate_key = 'rl_' . $key;
+    $requests = $_SESSION['rate_limit'][$rate_key] ?? [];
+    $now = time();
+
+    // Filter valid requests
+    $valid_requests = array_filter($requests, function ($timestamp) use ($now, $time_window) {
+        return ($now - $timestamp) < $time_window;
+    });
+
+    $remaining = max(0, $max_requests - count($valid_requests));
+    $oldest = !empty($valid_requests) ? min($valid_requests) : $now;
+    $reset_in = max(0, $time_window - ($now - $oldest));
+
+    return [
+        'remaining' => $remaining,
+        'reset_in' => $reset_in,
+        'limit' => $max_requests
+    ];
+}
+
+// ==================== EMAIL NOTIFICATIONS ====================
+
+/**
+ * Send email notification
+ * @param string $to Recipient email
+ * @param string $subject Email subject
+ * @param string $message Email body (HTML)
+ * @param string $from_email From email (optional)
+ * @param string $from_name From name (optional)
+ * @return bool Success status
+ */
+function send_email($to, $subject, $message, $from_email = null, $from_name = null)
+{
+    $from_email = $from_email ?? (defined('SITE_EMAIL') ? SITE_EMAIL : 'noreply@mietime.com');
+    $from_name = $from_name ?? (defined('SITE_NAME') ? SITE_NAME : 'Mie Time');
+
+    $headers = [
+        'MIME-Version: 1.0',
+        'Content-type: text/html; charset=utf-8',
+        'From: ' . $from_name . ' <' . $from_email . '>',
+        'Reply-To: ' . $from_email,
+        'X-Mailer: PHP/' . phpversion()
+    ];
+
+    // Wrap message in email template
+    $html_message = email_template($message, $subject);
+
+    // Send email
+    return mail($to, $subject, $html_message, implode("\r\n", $headers));
+}
+
+/**
+ * Email template wrapper
+ */
+function email_template($content, $title = '')
+{
+    $site_name = defined('SITE_NAME') ? SITE_NAME : 'Mie Time';
+    $site_url = defined('BASE_URL') ? BASE_URL : 'http://localhost/';
+
+    return '
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>' . htmlspecialchars($title) . '</title>
+    </head>
+    <body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4;padding:20px;">
+            <tr>
+                <td align="center">
+                    <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+                        <!-- Header -->
+                        <tr>
+                            <td style="background-color:#0d6efd;padding:30px;text-align:center;">
+                                <h1 style="color:#ffffff;margin:0;font-size:28px;">🍜 ' . $site_name . '</h1>
+                            </td>
+                        </tr>
+                        <!-- Content -->
+                        <tr>
+                            <td style="padding:40px 30px;">
+                                ' . $content . '
+                            </td>
+                        </tr>
+                        <!-- Footer -->
+                        <tr>
+                            <td style="background-color:#f8f9fa;padding:20px;text-align:center;border-top:1px solid #dee2e6;">
+                                <p style="margin:0;color:#6c757d;font-size:14px;">
+                                    © ' . date('Y') . ' ' . $site_name . '. All rights reserved.
+                                </p>
+                                <p style="margin:10px 0 0;font-size:12px;">
+                                    <a href="' . $site_url . '" style="color:#0d6efd;text-decoration:none;">Visit Website</a>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>';
+}
+
+/**
+ * Send verification email to new verified owner
+ */
+function send_verified_owner_email($user_id, $location_id)
+{
+    $user = get_user_by_id($user_id);
+    $location = get_location_by_id($location_id);
+
+    if (!$user || !$location) {
+        return false;
+    }
+
+    $subject = '🎉 Selamat! Anda Sekarang Verified Owner';
+    $message = '
+        <h2 style="color:#28a745;margin-top:0;">Selamat, ' . htmlspecialchars($user['username']) . '!</h2>
+        <p style="font-size:16px;line-height:1.6;color:#333;">
+            Klaim kepemilikan Anda untuk <strong>' . htmlspecialchars($location['name']) . '</strong> telah disetujui.
+        </p>
+        <p style="font-size:16px;line-height:1.6;color:#333;">
+            Sebagai Verified Owner, Anda sekarang memiliki akses ke fitur-fitur berikut:
+        </p>
+        <ul style="font-size:16px;line-height:1.8;color:#333;">
+            <li>Badge "Verified Owner" di profil dan review Anda</li>
+            <li>Prioritas dalam moderasi review</li>
+            <li>Kemampuan membalas review pelanggan</li>
+            <li>Akses statistik dan analytics kedai Anda</li>
+        </ul>
+        <p style="text-align:center;margin:30px 0;">
+            <a href="' . BASE_URL . 'kedai/' . $location_id . '" 
+               style="display:inline-block;padding:15px 30px;background-color:#0d6efd;color:#ffffff;text-decoration:none;border-radius:5px;font-weight:bold;">
+                Lihat Kedai Anda
+            </a>
+        </p>
+        <p style="font-size:14px;color:#6c757d;border-top:1px solid #dee2e6;padding-top:20px;margin-top:30px;">
+            Terima kasih telah bergabung dengan komunitas Mie Time!
+        </p>
+    ';
+
+    return send_email($user['email'], $subject, $message);
 }

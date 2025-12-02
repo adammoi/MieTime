@@ -23,6 +23,11 @@ define('BASE_PATH', __DIR__ . '/');
 define('UPLOAD_PATH', BASE_PATH . 'uploads/');
 define('ASSETS_URL', BASE_URL . 'assets/');
 
+// ==================== SITE CONFIG ====================
+define('SITE_NAME', 'Mie Time');
+define('SITE_EMAIL', 'noreply@mietime.com');
+define('ADMIN_EMAIL', 'admin@mietime.com');
+
 // ==================== SECURITY CONFIG ====================
 define('HASH_ALGO', PASSWORD_BCRYPT);
 define('HASH_COST', 10);

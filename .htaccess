@@ -40,10 +40,12 @@ RewriteRule ^review/add$ pages/reviews/add.php [L,QSA]
 RewriteRule ^dashboard$ pages/user/dashboard.php [L]
 RewriteRule ^profile$ pages/user/profile.php [L]
 RewriteRule ^badges$ pages/user/badges.php [L]
+RewriteRule ^notifications$ pages/user/notification.php [L,QSA]
 
 # Other routes
 RewriteRule ^search$ pages/search/index.php [L,QSA]
 RewriteRule ^leaderboard$ pages/leaderboard/index.php [L]
+RewriteRule ^stats$ pages/stats/index.php [L]
 
 # Admin routes (support /admin and /admin/{page})
 RewriteRule ^admin$ admin/index.php [L]

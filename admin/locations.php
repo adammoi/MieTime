@@ -87,80 +87,85 @@ $page_title = 'Admin - Kedai';
 include '../includes/header.php';
 ?>
 
-<div class="container-fluid my-4">
-    <div class="row">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-6">
         <?php include __DIR__ . '/sidebar.php'; ?>
-        <div class="col-12 col-md-10 col-lg-10 px-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3 class="mb-0">Manajemen Kedai</h3>
+
+        <!-- Main Content -->
+        <div class="md:col-span-3 lg:col-span-3 admin-container">
+            <div class="flex justify-between items-center mb-6">
                 <div>
-                    <a href="<?php echo BASE_URL; ?>admin/locations?status=pending_approval" class="btn btn-sm btn-outline-warning">Pending</a>
-                    <a href="<?php echo BASE_URL; ?>admin/locations" class="btn btn-sm btn-outline-secondary">Semua</a>
+                    <h2 class="text-4xl font-bold mb-2">Manajemen Kedai</h2>
+                    <p class="text-gray-600">Kelola data kedai mie ayam</p>
+                </div>
+                <div class="flex gap-2">
+                    <a href="<?php echo BASE_URL; ?>admin/locations?status=pending_approval"
+                        class="px-4 py-2 border-2 border-yellow-500 text-yellow-600 font-semibold rounded-lg hover:bg-yellow-50 transition">Pending</a>
+                    <a href="<?php echo BASE_URL; ?>admin/locations"
+                        class="px-4 py-2 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition">Semua</a>
                 </div>
             </div>
 
             <?php if ($total === 0): ?>
-                <div class="alert alert-info">Tidak ada kedai.</div>
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-6 rounded-lg">Tidak ada kedai.</div>
             <?php else: ?>
-                <div class="mx-auto" style="max-width:1100px;">
-                    <div class="card shadow-sm">
-                        <div class="card-body p-0">
-                            <div class="table-responsive px-3">
-                                <table class="table table-hover mb-0">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th style="width:60px;">No</th>
-                                            <th>Nama</th>
-                                            <th>Alamat</th>
-                                            <th>Status</th>
-                                            <th>Dibuat</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php $no = $offset + 1;
-                                        foreach ($locations as $loc): ?>
-                                            <tr>
-                                                <td><?php echo $no++; ?></td>
-                                                <td><?php echo htmlspecialchars($loc['name']); ?></td>
-                                                <td><?php echo htmlspecialchars($loc['address']); ?></td>
-                                                <td><?php echo htmlspecialchars($loc['status']); ?></td>
-                                                <td><small><?php echo format_date_id($loc['created_at']); ?></small></td>
-                                                <td>
-                                                    <a class="btn btn-sm btn-outline-primary" href="<?php echo BASE_URL; ?>kedai/<?php echo (int)$loc['location_id']; ?>" target="_blank">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-sm font-bold text-gray-900" style="width:60px;">No</th>
+                                    <th class="px-4 py-3 text-left text-sm font-bold text-gray-900">Nama</th>
+                                    <th class="px-4 py-3 text-left text-sm font-bold text-gray-900">Alamat</th>
+                                    <th class="px-4 py-3 text-left text-sm font-bold text-gray-900" style="width:100px;">Status</th>
+                                    <th class="px-4 py-3 text-left text-sm font-bold text-gray-900" style="width:120px;">Dibuat</th>
+                                    <th class="px-4 py-3 text-left text-sm font-bold text-gray-900" style="width:200px;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <?php $no = $offset + 1;
+                                foreach ($locations as $loc): ?>
+                                    <tr class="hover:bg-gray-50 transition">
+                                        <td class="px-4 py-4"><?php echo $no++; ?></td>
+                                        <td class="px-4 py-4 font-medium"><?php echo htmlspecialchars($loc['name']); ?></td>
+                                        <td class="px-4 py-4 text-gray-600"><?php echo htmlspecialchars($loc['address']); ?></td>
+                                        <td class="px-4 py-4"><?php echo htmlspecialchars($loc['status']); ?></td>
+                                        <td class="px-4 py-4 text-sm text-gray-600"><?php echo format_date_id($loc['created_at']); ?></td>
+                                        <td class="px-4 py-4">
+                                            <a class="px-3 py-2 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition inline-block"
+                                                href="<?php echo BASE_URL; ?>kedai/<?php echo (int)$loc['location_id']; ?>" target="_blank">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
 
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary ms-1" data-bs-toggle="modal" data-bs-target="#editLocationModal" data-location-id="<?php echo (int)$loc['location_id']; ?>" title="Edit kedai">
-                                                        <i class="fas fa-pen"></i>
+                                            <button type="button" class="px-3 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition ml-1"
+                                                data-bs-toggle="modal" data-bs-target="#editLocationModal" data-location-id="<?php echo (int)$loc['location_id']; ?>" title="Edit kedai">
+                                                <i class="fas fa-pen"></i>
+                                            </button>
+
+                                            <?php if ($loc['status'] === 'pending_approval'): ?>
+                                                <form method="POST" class="inline ml-1 ajax-approve-location">
+                                                    <input type="hidden" name="<?php echo CSRF_TOKEN_NAME; ?>" value="<?php echo $csrf_token; ?>">
+                                                    <input type="hidden" name="location_id" value="<?php echo (int)$loc['location_id']; ?>">
+                                                    <input type="hidden" name="action" value="approve">
+                                                    <button class="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                                                        <i class="fas fa-check"></i>
                                                     </button>
+                                                </form>
+                                            <?php endif; ?>
 
-                                                    <?php if ($loc['status'] === 'pending_approval'): ?>
-                                                        <form method="POST" class="d-inline ajax-approve-location">
-                                                            <input type="hidden" name="<?php echo CSRF_TOKEN_NAME; ?>" value="<?php echo $csrf_token; ?>">
-                                                            <input type="hidden" name="location_id" value="<?php echo (int)$loc['location_id']; ?>">
-                                                            <input type="hidden" name="action" value="approve">
-                                                            <button class="btn btn-sm btn-success ms-1">
-                                                                <i class="fas fa-check"></i>
-                                                            </button>
-                                                        </form>
-                                                    <?php endif; ?>
-
-                                                    <form method="POST" class="d-inline ms-1 ajax-delete-location" data-location-id="<?php echo (int)$loc['location_id']; ?>">
-                                                        <input type="hidden" name="<?php echo CSRF_TOKEN_NAME; ?>" value="<?php echo $csrf_token; ?>">
-                                                        <input type="hidden" name="location_id" value="<?php echo (int)$loc['location_id']; ?>">
-                                                        <input type="hidden" name="action" value="delete">
-                                                        <button class="btn btn-sm btn-danger">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                                            <form method="POST" class="inline ml-1 ajax-delete-location" data-location-id="<?php echo (int)$loc['location_id']; ?>">
+                                                <input type="hidden" name="<?php echo CSRF_TOKEN_NAME; ?>" value="<?php echo $csrf_token; ?>">
+                                                <input type="hidden" name="location_id" value="<?php echo (int)$loc['location_id']; ?>">
+                                                <input type="hidden" name="action" value="delete">
+                                                <button class="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -168,11 +173,12 @@ include '../includes/header.php';
                 $total_pages = (int)ceil($total / $per_page);
                 if ($total_pages > 1):
                 ?>
-                    <nav class="mt-3">
-                        <ul class="pagination">
+                    <nav class="mt-6">
+                        <ul class="flex justify-center gap-2">
                             <?php for ($p = 1; $p <= $total_pages; $p++): ?>
-                                <li class="page-item <?php echo $p === $page ? 'active' : ''; ?>">
-                                    <a class="page-link" href="?page=<?php echo $p; ?><?php echo $status ? '&status=' . urlencode($status) : ''; ?>"><?php echo $p; ?></a>
+                                <li>
+                                    <a class="px-4 py-2 border-2 <?php echo $p === $page ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-300 text-gray-700 hover:bg-gray-100'; ?> font-semibold rounded-lg transition"
+                                        href="?page=<?php echo $p; ?><?php echo $status ? '&status=' . urlencode($status) : ''; ?>"><?php echo $p; ?></a>
                                 </li>
                             <?php endfor; ?>
                         </ul>
@@ -209,14 +215,14 @@ include '../includes/header.php';
                         <textarea class="form-control" id="modal_address" name="address" rows="3" required></textarea>
                     </div>
 
-                    <!-- search box for geocoding -->
+                    <!-- GPS location button -->
                     <div class="mb-3">
-                        <label class="form-label">Cari Lokasi</label>
-                        <div class="input-group">
-                            <input type="text" id="modal_search_input" class="form-control" placeholder="Ketik alamat atau nama tempat...">
-                            <button class="btn btn-outline-secondary" type="button" id="modal_search_btn">Cari</button>
+                        <label class="form-label">Lokasi GPS</label>
+                        <div class="d-grid">
+                            <button class="btn btn-primary" type="button" id="modal_find_location_btn">
+                                <i class="fas fa-location-arrow me-2"></i>Temukan Lokasi Saya
+                            </button>
                         </div>
-                        <div id="modal_search_results" class="list-group mt-2" style="max-height:180px; overflow:auto; display:none;"></div>
                     </div>
 
                     <!-- hidden lat/lng (kept for form submission) and visible read-only coords -->
@@ -536,72 +542,54 @@ include '../includes/header.php';
         bindAjaxDeleteLocations();
         bindAjaxApproveLocations();
 
-        // --- Nominatim search for modal map ---
-        var searchInput = document.getElementById('modal_search_input');
-        var searchBtn = document.getElementById('modal_search_btn');
-        var searchResults = document.getElementById('modal_search_results');
+        // --- GPS location for modal map ---
+        var findLocationBtn = document.getElementById('modal_find_location_btn');
 
-        function doLocationSearch(q) {
-            if (!q || q.trim() === '') {
-                searchResults.style.display = 'none';
-                return;
-            }
-            searchResults.innerHTML = '<div class="list-group-item">Mencari...</div>';
-            searchResults.style.display = 'block';
-            fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&q=' + encodeURIComponent(q), {
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(function(res) {
-                    return res.json();
-                })
-                .then(function(list) {
-                    if (!Array.isArray(list) || list.length === 0) {
-                        searchResults.innerHTML = '<div class="list-group-item">Tidak ditemukan</div>';
-                        return;
-                    }
-                    searchResults.innerHTML = '';
-                    list.forEach(function(item) {
-                        var btn = document.createElement('button');
-                        btn.type = 'button';
-                        btn.className = 'list-group-item list-group-item-action';
-                        btn.setAttribute('data-lat', item.lat);
-                        btn.setAttribute('data-lon', item.lon);
-                        btn.textContent = item.display_name;
-                        searchResults.appendChild(btn);
-                    });
-                })
-                .catch(function(err) {
-                    console.error(err);
-                    searchResults.innerHTML = '<div class="list-group-item text-danger">Terjadi kesalahan</div>';
-                });
-        }
+        if (findLocationBtn) {
+            findLocationBtn.addEventListener('click', function() {
+                if (!navigator.geolocation) {
+                    showAlert('Browser Anda tidak mendukung fitur GPS', 'warning');
+                    return;
+                }
 
-        if (searchBtn && searchInput && searchResults) {
-            searchBtn.addEventListener('click', function() {
-                doLocationSearch(searchInput.value);
-            });
-            searchInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    doLocationSearch(searchInput.value);
-                }
-            });
-            // delegate clicks on results
-            searchResults.addEventListener('click', function(e) {
-                var btn = e.target.closest('.list-group-item');
-                if (!btn) return;
-                var lat = btn.getAttribute('data-lat');
-                var lon = btn.getAttribute('data-lon');
-                if (lat && lon) {
-                    setMarkerLatLng(lat, lon);
-                    searchResults.style.display = 'none';
-                }
-            });
-            // hide results when modal closed
-            editModal.addEventListener('hidden.bs.modal', function() {
-                searchResults.style.display = 'none';
+                findLocationBtn.disabled = true;
+                var originalHtml = findLocationBtn.innerHTML;
+                findLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Mencari lokasi...';
+
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        var lat = position.coords.latitude;
+                        var lng = position.coords.longitude;
+                        setMarkerLatLng(lat, lng);
+                        findLocationBtn.disabled = false;
+                        findLocationBtn.innerHTML = originalHtml;
+                        showAlert('Lokasi berhasil ditemukan!', 'success');
+                        setTimeout(clearAlert, 2000);
+                    },
+                    function(error) {
+                        findLocationBtn.disabled = false;
+                        findLocationBtn.innerHTML = originalHtml;
+                        var errorMsg = 'Gagal mendapatkan lokasi: ';
+                        switch (error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMsg += 'Izin lokasi ditolak';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMsg += 'Informasi lokasi tidak tersedia';
+                                break;
+                            case error.TIMEOUT:
+                                errorMsg += 'Waktu permintaan habis';
+                                break;
+                            default:
+                                errorMsg += 'Kesalahan tidak diketahui';
+                        }
+                        showAlert(errorMsg, 'danger');
+                    }, {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
             });
         }
     });

@@ -48,6 +48,19 @@ function require_admin_or_moderator()
 }
 
 /**
+ * Require admin only
+ */
+function require_admin()
+{
+    require_login();
+
+    if (!has_role('admin')) {
+        set_flash('error', 'Akses ditolak. Hanya admin yang diizinkan');
+        redirect('');
+    }
+}
+
+/**
  * Check if user owns the resource
  */
 function owns_resource($user_id)
@@ -82,13 +95,13 @@ function is_verified_owner_of($location_id)
 function get_role_badge($role)
 {
     $badges = [
-        'admin' => '<span class="badge bg-danger">Admin</span>',
-        'moderator' => '<span class="badge bg-warning text-dark">Moderator</span>',
-        'verified_owner' => '<span class="badge bg-success">Verified Owner</span>',
-        'contributor' => ''
+        'admin' => '<span class="badge bg-danger"><i class="fas fa-shield-alt me-1"></i>Admin</span>',
+        'moderator' => '<span class="badge bg-warning text-dark"><i class="fas fa-user-shield me-1"></i>Moderator</span>',
+        'verified_owner' => '<span class="badge bg-success"><i class="fas fa-certificate me-1"></i>Verified Owner</span>',
+        'contributor' => '<span class="badge bg-primary"><i class="fas fa-user me-1"></i>Contributor</span>'
     ];
 
-    return $badges[$role] ?? '';
+    return $badges[$role] ?? '<span class="badge bg-secondary"><i class="fas fa-user me-1"></i>User</span>';
 }
 
 /**

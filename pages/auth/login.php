@@ -56,75 +56,82 @@ $page_title = 'Login';
 include '../../includes/header.php';
 ?>
 
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card shadow">
-                <div class="card-body p-5">
-                    <!-- Logo -->
-                    <div class="text-center mb-4">
-                        <h2 class="fw-bold text-primary">
-                            <i class="fas fa-bowl-food me-2"></i>Mie Time
-                        </h2>
-                        <p class="text-muted">Masuk ke akun Anda</p>
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="max-w-md w-full">
+        <div class="bg-white rounded-2xl shadow-2xl p-8">
+            <!-- Logo -->
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                    <i class="fas fa-bowl-food mr-2"></i>Mie Time
+                </h2>
+                <p class="text-gray-600">Masuk ke akun Anda</p>
+            </div>
+
+            <!-- Error Alert -->
+            <?php if ($error): ?>
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-6">
+                    <div class="flex items-start">
+                        <i class="fas fa-exclamation-circle text-red-500 mt-0.5 mr-3"></i>
+                        <p class="text-red-700"><?php echo $error; ?></p>
                     </div>
+                </div>
+            <?php endif; ?>
 
-                    <!-- Error Alert -->
-                    <?php if ($error): ?>
-                        <div class="alert alert-danger alert-dismissible fade show">
-                            <i class="fas fa-exclamation-circle me-2"></i><?php echo $error; ?>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <!-- Login Form -->
+            <form method="POST" action="" class="space-y-6">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400"></i>
                         </div>
-                    <?php endif; ?>
-
-                    <!-- Login Form -->
-                    <form method="POST" action="">
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="fas fa-envelope"></i>
-                                </span>
-                                <input type="email" class="form-control" id="email" name="email"
-                                    placeholder="nama@email.com" required
-                                    value="<?php echo htmlspecialchars($email ?? ''); ?>">
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="fas fa-lock"></i>
-                                </span>
-                                <input type="password" class="form-control" id="password" name="password"
-                                    placeholder="Masukkan password" required>
-                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                            <label class="form-check-label" for="remember">
-                                Ingat saya
-                            </label>
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-sign-in-alt me-2"></i>Masuk
-                            </button>
-                        </div>
-                    </form>
-
-                    <!-- Divider -->
-                    <div class="text-center my-4">
-                        <span class="text-muted">atau</span>
+                        <input type="email" id="email" name="email"
+                            class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="nama@email.com" required
+                            value="<?php echo htmlspecialchars($email ?? ''); ?>">
                     </div>
+                </div>
 
-                    <!-- Social Login
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" id="password" name="password"
+                            class="pl-10 pr-12 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Masukkan password" required>
+                        <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <i class="fas fa-eye text-gray-400 hover:text-gray-600"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center">
+                    <input type="checkbox" id="remember" name="remember" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="remember" class="ml-2 block text-sm text-gray-700">
+                        Ingat saya
+                    </label>
+                </div>
+
+                <div>
+                    <button type="submit" class="w-full gradient-primary text-white font-semibold py-3 rounded-lg hover:shadow-lg transition">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Masuk
+                    </button>
+                </div>
+            </form>
+
+            <!-- Divider -->
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">atau</span>
+                </div>
+            </div>
+
+            <!-- Social Login
                     <div class="d-grid gap-2">
                         <button class="btn btn-outline-danger" onclick="alert('Fitur dalam pengembangan')">
                             <i class="fab fa-google me-2"></i>Masuk dengan Google
@@ -134,30 +141,21 @@ include '../../includes/header.php';
                         </button>
                     </div> -->
 
-                    <!-- Links -->
-                    <div class="text-center mt-4">
-                        <p class="text-muted mb-1">
-                            <a href="#" class="text-decoration-none">Lupa password?</a>
-                        </p>
-                        <p class="text-muted">
-                            Belum punya akun?
-                            <a href="<?php echo BASE_URL; ?>register" class="text-decoration-none fw-bold">
-                                Daftar sekarang
-                            </a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Demo Credentials -->
-            <div class="alert alert-info mt-3">
-                <strong><i class="fas fa-info-circle me-2"></i>Demo Login:</strong><br>
-                <small>
-                    Email: admin@mietime.com<br>
-                    Password: admin123
-                </small>
+            <!-- Links -->
+            <div class="text-center space-y-2">
+                <p class="text-sm text-gray-600">
+                    <a href="#" class="text-blue-600 hover:text-blue-700 font-medium">Lupa password?</a>
+                </p>
+                <p class="text-sm text-gray-600">
+                    Belum punya akun?
+                    <a href="<?php echo BASE_URL; ?>register" class="text-blue-600 hover:text-blue-700 font-semibold">
+                        Daftar sekarang
+                    </a>
+                </p>
             </div>
         </div>
+
+
     </div>
 </div>
 

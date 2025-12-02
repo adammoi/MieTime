@@ -10,6 +10,31 @@ require_admin_or_moderator();
 
 try {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $action = $_GET['action'] ?? 'get';
+
+        // Search users
+        if ($action === 'search') {
+            $query = trim($_GET['q'] ?? '');
+            if (strlen($query) < 2) {
+                echo json_encode(['users' => []]);
+                exit;
+            }
+
+            $search = '%' . $query . '%';
+            $users = db_fetch_all(
+                'SELECT user_id, username, email, role 
+                 FROM users 
+                 WHERE username LIKE ? OR email LIKE ? 
+                 ORDER BY username ASC 
+                 LIMIT 20',
+                [$search, $search]
+            );
+
+            echo json_encode(['users' => $users]);
+            exit;
+        }
+
+        // Get single user
         $user_id = isset($_GET['user_id']) ? (int)$_GET['user_id'] : 0;
         if ($user_id <= 0) {
             http_response_code(400);

@@ -83,68 +83,83 @@ $page_title = 'Daftar';
 include '../../includes/header.php';
 ?>
 
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-body p-4">
-                    <div class="text-center mb-3">
-                        <h3 class="fw-bold text-primary"><i class="fas fa-bowl-food me-2"></i>Mie Time</h3>
-                        <p class="text-muted">Buat akun baru</p>
-                    </div>
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+    <div class="max-w-md w-full">
+        <div class="bg-white rounded-2xl shadow-2xl p-8">
+            <div class="text-center mb-8">
+                <h3 class="text-3xl font-bold text-gray-900 mb-2">
+                    <i class="fas fa-bowl-food mr-2"></i>Mie Time
+                </h3>
+                <p class="text-gray-600">Buat akun baru</p>
+            </div>
 
-                    <?php if (!empty($errors)): ?>
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                <?php foreach ($errors as $err): ?>
-                                    <li><?php echo htmlspecialchars($err); ?></li>
-                                <?php endforeach; ?>
-                            </ul>
+            <?php if (!empty($errors)): ?>
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-6">
+                    <ul class="space-y-1 text-red-700">
+                        <?php foreach ($errors as $err): ?>
+                            <li class="flex items-start">
+                                <i class="fas fa-exclamation-circle mt-0.5 mr-2"></i>
+                                <span><?php echo htmlspecialchars($err); ?></span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST" action="" class="space-y-5">
+                <input type="hidden" name="<?php echo CSRF_TOKEN_NAME; ?>" value="<?php echo generate_csrf_token(); ?>">
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-user text-gray-400"></i>
                         </div>
-                    <?php endif; ?>
-
-                    <form method="POST" action="">
-                        <input type="hidden" name="<?php echo CSRF_TOKEN_NAME; ?>" value="<?php echo generate_csrf_token(); ?>">
-
-                        <div class="mb-3">
-                            <label class="form-label">Username</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                <input type="text" name="username" class="form-control" required value="<?php echo htmlspecialchars($values['username']); ?>">
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                <input type="email" name="email" class="form-control" required value="<?php echo htmlspecialchars($values['email']); ?>">
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                <input type="password" name="password" id="password" class="form-control" required placeholder="Minimal 6 karakter">
-                                <button class="btn btn-outline-secondary" type="button" id="togglePassword"><i class="fas fa-eye"></i></button>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Konfirmasi Password</label>
-                            <input type="password" name="password_confirm" class="form-control" required>
-                        </div>
-
-                        <div class="d-grid">
-                            <button class="btn btn-primary btn-lg" type="submit"><i class="fas fa-user-plus me-2"></i>Daftar</button>
-                        </div>
-                    </form>
-
-                    <div class="text-center mt-3">
-                        <p class="text-muted mb-0">Sudah punya akun? <a href="<?php echo BASE_URL; ?>login" class="fw-bold">Masuk</a></p>
+                        <input type="text" name="username" required value="<?php echo htmlspecialchars($values['username']); ?>"
+                            class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
                 </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400"></i>
+                        </div>
+                        <input type="email" name="email" required value="<?php echo htmlspecialchars($values['email']); ?>"
+                            class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" name="password" id="password" required placeholder="Minimal 6 karakter"
+                            class="pl-10 pr-12 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <i class="fas fa-eye text-gray-400 hover:text-gray-600"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Konfirmasi Password</label>
+                    <input type="password" name="password_confirm" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+
+                <div>
+                    <button type="submit" class="w-full gradient-primary text-white font-semibold py-3 rounded-lg hover:shadow-lg transition">
+                        <i class="fas fa-user-plus mr-2"></i>Daftar
+                    </button>
+                </div>
+            </form>
+
+            <div class="text-center mt-6">
+                <p class="text-sm text-gray-600">Sudah punya akun? <a href="<?php echo BASE_URL; ?>login" class="text-blue-600 hover:text-blue-700 font-semibold">Masuk</a></p>
             </div>
         </div>
     </div>

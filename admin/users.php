@@ -71,6 +71,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             set_flash('error', 'Peran tidak valid');
         } else {
             db_update('users', ['role' => $new_role], 'user_id = :user_id', ['user_id' => $user_id]);
+
+            // Auto-assign role badge if role is admin, moderator, or verified_owner
+            if (in_array($new_role, ['admin', 'moderator', 'verified_owner'])) {
+                assign_role_badge($user_id);
+            }
+
             if ($is_ajax) {
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode(['success' => true]);
@@ -151,75 +157,78 @@ $page_title = 'Admin - Pengguna';
 include '../includes/header.php';
 ?>
 
-<div class="container-fluid my-4">
-    <div class="row">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-6">
         <?php include __DIR__ . '/sidebar.php'; ?>
-        <div class="col-12 col-md-10 col-lg-10 px-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3 class="mb-0">Manajemen Pengguna</h3>
-                <form class="d-flex" method="GET" action="">
-                    <input type="text" name="q" class="form-control form-control-sm me-2" placeholder="Cari username atau email" value="<?php echo htmlspecialchars($q); ?>">
-                    <button class="btn btn-sm btn-primary">Cari</button>
+
+        <!-- Main Content -->
+        <div class="md:col-span-3 lg:col-span-3 admin-container">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-4xl font-bold mb-2">Manajemen Pengguna</h2>
+                    <p class="text-gray-600">Kelola akun pengguna platform</p>
+                </div>
+                <form class="flex gap-2" method="GET" action="">
+                    <input type="text" name="q" class="px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition"
+                        placeholder="Cari username atau email" value="<?php echo htmlspecialchars($q); ?>">
+                    <button class="px-6 py-2 gradient-primary text-white font-bold rounded-lg hover-lift transition">Cari</button>
                 </form>
             </div>
 
-            <!-- Aksi: menggunakan tombol edit (pensil) yang membuka modal nanti -->
-
             <?php if ($total === 0): ?>
-                <div class="alert alert-info">Tidak ada pengguna ditemukan.</div>
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-6 rounded-lg">Tidak ada pengguna ditemukan.</div>
             <?php else: ?>
-                <div class="card shadow-sm">
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th style="width:60px">No</th>
-                                        <th>Username</th>
-                                        <th>Email</th>
-                                        <th style="width:120px">Peran</th>
-                                        <th style="width:80px">Reviews</th>
-                                        <th style="width:80px">Poin</th>
-                                        <th style="width:140px">Terdaftar</th>
-                                        <th style="width:120px">Status</th>
-                                        <th style="width:160px">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php $no = $offset + 1;
-                                    foreach ($users as $u): ?>
-                                        <tr>
-                                            <td><?php echo $no++; ?></td>
-                                            <td><?php echo htmlspecialchars($u['username']); ?></td>
-                                            <td><?php echo htmlspecialchars($u['email']); ?></td>
-                                            <td><?php echo htmlspecialchars($u['role']); ?> <?php echo get_role_badge($u['role']); ?></td>
-                                            <td><?php echo (int)($u['review_count'] ?? 0); ?></td>
-                                            <td><?php echo (int)($u['points'] ?? 0); ?></td>
-                                            <td><small><?php echo format_date_id($u['created_at']); ?></small></td>
-                                            <td>
-                                                <?php if (!empty($u['is_banned'])): ?>
-                                                    <span class="badge bg-dark">Diblokir</span>
-                                                <?php else: ?>
-                                                    <span class="badge bg-success">Aktif</span>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editUserModal" data-user-id="<?php echo (int)$u['user_id']; ?>" title="Edit pengguna">
-                                                    <i class="fas fa-pen"></i>
-                                                </button>
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-sm font-bold text-gray-900" style="width:60px">No</th>
+                                    <th class="px-4 py-3 text-left text-sm font-bold text-gray-900">Username</th>
+                                    <th class="px-4 py-3 text-left text-sm font-bold text-gray-900">Email</th>
+                                    <th class="px-4 py-3 text-left text-sm font-bold text-gray-900" style="width:120px">Peran</th>
+                                    <th class="px-4 py-3 text-left text-sm font-bold text-gray-900" style="width:80px">Reviews</th>
+                                    <th class="px-4 py-3 text-left text-sm font-bold text-gray-900" style="width:80px">Poin</th>
+                                    <th class="px-4 py-3 text-left text-sm font-bold text-gray-900" style="width:140px">Terdaftar</th>
+                                    <th class="px-4 py-3 text-left text-sm font-bold text-gray-900" style="width:120px">Status</th>
+                                    <th class="px-4 py-3 text-left text-sm font-bold text-gray-900" style="width:180px">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <?php $no = $offset + 1;
+                                foreach ($users as $u): ?>
+                                    <tr class="hover:bg-gray-50 transition">
+                                        <td class="px-4 py-4"><?php echo $no++; ?></td>
+                                        <td class="px-4 py-4 font-medium"><?php echo htmlspecialchars($u['username']); ?></td>
+                                        <td class="px-4 py-4 text-gray-600"><?php echo htmlspecialchars($u['email']); ?></td>
+                                        <td class="px-4 py-4"><?php echo htmlspecialchars($u['role']); ?> <?php echo get_role_badge($u['role']); ?></td>
+                                        <td class="px-4 py-4"><?php echo (int)($u['review_count'] ?? 0); ?></td>
+                                        <td class="px-4 py-4 font-bold text-blue-600"><?php echo (int)($u['points'] ?? 0); ?></td>
+                                        <td class="px-4 py-4 text-sm text-gray-600"><?php echo format_date_id($u['created_at']); ?></td>
+                                        <td class="px-4 py-4">
+                                            <?php if (!empty($u['is_banned'])): ?>
+                                                <span class="inline-flex items-center px-3 py-1 bg-gray-800 text-white rounded-full text-xs font-semibold">Diblokir</span>
+                                            <?php else: ?>
+                                                <span class="inline-flex items-center px-3 py-1 bg-green-600 text-white rounded-full text-xs font-semibold">Aktif</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="px-4 py-4">
+                                            <button type="button" class="px-3 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition"
+                                                data-bs-toggle="modal" data-bs-target="#editUserModal" data-user-id="<?php echo (int)$u['user_id']; ?>" title="Edit pengguna">
+                                                <i class="fas fa-pen"></i>
+                                            </button>
 
-                                                <form method="POST" class="d-inline ms-1 ajax-delete-user" data-user-id="<?php echo (int)$u['user_id']; ?>">
-                                                    <input type="hidden" name="<?php echo CSRF_TOKEN_NAME; ?>" value="<?php echo $csrf_token; ?>">
-                                                    <input type="hidden" name="user_id" value="<?php echo (int)$u['user_id']; ?>">
-                                                    <input type="hidden" name="action" value="delete">
-                                                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
+                                            <form method="POST" class="inline ml-2 ajax-delete-user" data-user-id="<?php echo (int)$u['user_id']; ?>">
+                                                <input type="hidden" name="<?php echo CSRF_TOKEN_NAME; ?>" value="<?php echo $csrf_token; ?>">
+                                                <input type="hidden" name="user_id" value="<?php echo (int)$u['user_id']; ?>">
+                                                <input type="hidden" name="action" value="delete">
+                                                <button class="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -227,11 +236,12 @@ include '../includes/header.php';
                 $total_pages = (int)ceil($total / $per_page);
                 if ($total_pages > 1):
                 ?>
-                    <nav class="mt-3">
-                        <ul class="pagination">
+                    <nav class="mt-6">
+                        <ul class="flex justify-center gap-2">
                             <?php for ($p = 1; $p <= $total_pages; $p++): ?>
-                                <li class="page-item <?php echo $p === $page ? 'active' : ''; ?>">
-                                    <a class="page-link" href="?page=<?php echo $p; ?><?php echo $q ? '&q=' . urlencode($q) : ''; ?>"><?php echo $p; ?></a>
+                                <li>
+                                    <a class="px-4 py-2 border-2 <?php echo $p === $page ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-300 text-gray-700 hover:bg-gray-100'; ?> font-semibold rounded-lg transition"
+                                        href="?page=<?php echo $p; ?><?php echo $q ? '&q=' . urlencode($q) : ''; ?>"><?php echo $p; ?></a>
                                 </li>
                             <?php endfor; ?>
                         </ul>

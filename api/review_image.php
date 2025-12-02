@@ -22,6 +22,19 @@ if (!verify_csrf_token($token)) {
     exit;
 }
 
+// Rate limiting
+if (is_logged_in()) {
+    $user_id = get_current_user_id();
+    if (!check_rate_limit('api_review_image_' . $user_id, 10, 60)) {
+        $rate_info = get_rate_limit_info('api_review_image_' . $user_id, 10, 60);
+        http_response_code(429);
+        echo json_encode([
+            'error' => 'Terlalu banyak permintaan. Coba lagi dalam ' . $rate_info['reset_in'] . ' detik.'
+        ]);
+        exit;
+    }
+}
+
 $image_id = isset($_POST['image_id']) ? (int)$_POST['image_id'] : 0;
 if ($image_id <= 0) {
     http_response_code(400);

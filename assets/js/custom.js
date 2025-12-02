@@ -44,31 +44,52 @@ function initTooltips() {
 
 // ==================== SCROLL TO TOP ====================
 function initScrollToTop() {
-  // Create button if not exists
-  if (!document.querySelector(".scroll-to-top")) {
-    const btn = document.createElement("div");
+  // Ensure one global button, and move it to body if it exists elsewhere
+  let btn = document.querySelector(".scroll-to-top");
+  if (!btn) {
+    btn = document.createElement("div");
     btn.className = "scroll-to-top";
     btn.innerHTML = '<i class="fas fa-arrow-up"></i>';
-    document.body.appendChild(btn);
-
-    btn.addEventListener("click", function () {
-      window.scrollTo({
-        top: 0,
-        behavior:
-          window.matchMedia &&
-          window.matchMedia("(prefers-reduced-motion: reduce)").matches
-            ? "auto"
-            : "smooth",
-      });
-    });
+    // Accessibility attributes
+    btn.setAttribute("role", "button");
+    btn.setAttribute("aria-label", "Scroll to top");
+    btn.setAttribute("title", "Kembali ke atas");
   }
+  // If button is not a direct child of body, move it
+  if (btn.parentElement !== document.body) {
+    document.body.appendChild(btn);
+  }
+  // Inline safeguards to keep it above footer/content
+  btn.style.position = "fixed";
+  btn.style.zIndex = "99999";
+  btn.style.pointerEvents = "auto";
+  // Click handler (avoid duplicate listeners)
+  btn.onclick = function () {
+    window.scrollTo({
+      top: 0,
+      behavior:
+        window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+    });
+  };
+
+  // Keyboard accessibility: activate on Enter/Space
+  btn.tabIndex = 0;
+  btn.onkeydown = function (e) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      btn.click();
+    }
+  };
 
   // Show/hide on scroll
   window.addEventListener("scroll", function () {
     const btn = document.querySelector(".scroll-to-top");
-    if (window.pageYOffset > 300) {
+    if (btn && window.pageYOffset > 300) {
       btn.classList.add("show");
-    } else {
+    } else if (btn) {
       btn.classList.remove("show");
     }
   });

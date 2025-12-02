@@ -1,23 +1,109 @@
 /**
  * Mie Time - Custom CSS
- * Additional styling untuk meningkatkan UX
+ * Tailwind CSS Custom Utilities & Components
  */
 
-/* ==================== GLOBAL STYLES ==================== */
-:root {
-  --primary-color: #0d6efd;
-  --secondary-color: #6c757d;
-  --success-color: #198754;
-  --danger-color: #dc3545;
-  --warning-color: #ffc107;
-  --info-color: #0dcaf0;
-  --dark-color: #212529;
-  --light-color: #f8f9fa;
+/* ==================== TAILWIND BASE ==================== */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Ensure proper scroll and overflow behavior */
+html,
+body {
+  overflow-x: hidden;
+  position: relative;
+  height: auto;
 }
 
 body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
+  min-height: 100vh;
+}
+
+/* Normalize links: remove default underlines globally.
+   Tailwind sets anchors to inherit text-decoration from parents.
+   Ensuring the root has no underline prevents unexpected underlines.
+   Explicit utilities like `hover:underline` will still opt-in underline. */
+a {
+  text-decoration: none !important;
+}
+
+/* Override Bootstrap's default link underlines */
+.admin-container a,
+.modal a,
+.btn,
+button a {
+  text-decoration: none !important;
+}
+
+/* Ensure footer doesn't block scroll-to-top */
+footer {
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+/* ==================== CUSTOM UTILITIES ==================== */
+@layer utilities {
+  /* Icon sizing adjustments */
+  .fa-2x {
+    font-size: 1.5em !important;
+  }
+
+  .fa-3x {
+    font-size: 2em !important;
+  }
+
+  .fa-4x {
+    font-size: 2.5em !important;
+  }
+
+  /* Grayscale filter for locked items */
+  .grayscale {
+    filter: grayscale(100%);
+  }
+
+  /* Gradient backgrounds */
+  .gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .gradient-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  }
+
+  .gradient-danger {
+    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+  }
+
+  .gradient-warning {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+
+  .gradient-info {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  }
+
+  .gradient-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  /* Hover lift effect */
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Text gradient */
+  .text-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 }
 
 /* Smooth scroll only when user prefers motion */
@@ -50,6 +136,16 @@ body {
   }
 }
 
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 .fade-in {
   animation: fadeIn 0.45s ease-in-out;
 }
@@ -58,320 +154,38 @@ body {
   animation: slideIn 0.45s ease-in-out;
 }
 
-/* ==================== CARDS ==================== */
-.card {
-  border: none;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.card-hover {
-  transition: all 0.22s ease;
-}
-
-.card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
-}
-
-/* ==================== BUTTONS ==================== */
-.btn {
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.18s ease;
-  border-width: 2px;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-}
-
-/* ==================== NAVBAR ==================== */
-.navbar {
-  /* Reduce blur for performance */
-  backdrop-filter: blur(4px);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.navbar-brand {
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.nav-link {
-  font-weight: 500;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.nav-link:hover {
-  transform: translateY(-2px);
-}
-
-.nav-link::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 2px;
-  background: white;
-  transition: width 0.3s ease;
-}
-
-.nav-link:hover::after {
-  width: 80%;
-}
-
-/* ==================== BADGES ==================== */
-.badge {
-  border-radius: 6px;
-  padding: 0.4em 0.8em;
-  font-weight: 600;
-}
-
-/* ==================== RATINGS ==================== */
-.star-rating {
-  color: #ffc107;
-  font-size: 1.2rem;
-}
-
-.text-warning {
-  color: #ffc107 !important;
-}
-
-/* ==================== FORMS ==================== */
-.form-control,
-.form-select {
-  border-radius: 8px;
-  border: 2px solid #e0e0e0;
-  transition: all 0.3s ease;
-}
-
-.form-control:focus,
-.form-select:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
-}
-
-.input-group-text {
-  background: #f8f9fa;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px 0 0 8px;
-}
-
-/* ==================== MODALS ==================== */
-.modal-content {
-  border-radius: 16px;
-  border: none;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-}
-
-.modal-header {
-  border-bottom: none;
-}
-
-.modal-footer {
-  border-top: none;
-}
-
-/* ==================== ALERTS ==================== */
-.alert {
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* ==================== PAGINATION ==================== */
-.pagination {
-  gap: 0.5rem;
-}
-
-.page-link {
-  border-radius: 8px;
-  border: 2px solid #e0e0e0;
-  color: var(--primary-color);
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.page-link:hover {
-  background: var(--primary-color);
-  color: white;
-  transform: translateY(-2px);
-}
-
-.page-item.active .page-link {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-/* ==================== LOCATION CARDS ==================== */
-.location-card {
-  transition: all 0.18s ease;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.location-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16) !important;
-}
-
-.location-card img {
-  transition: transform 0.18s ease;
-}
-
-.location-card:hover img {
-  transform: scale(1.06);
-}
-
-/* ==================== REVIEW ITEMS ==================== */
-.review-item {
-  padding: 1rem;
-  border-radius: 8px;
-  transition: background 0.3s ease;
-}
-
-.review-item:hover {
-  background: #f8f9fa;
-}
-
-/* ==================== LEADERBOARD ==================== */
-.leaderboard-rank {
-  font-size: 2rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.leaderboard-item {
-  transition: all 0.3s ease;
-}
-
-.leaderboard-item:hover {
-  background: #f8f9fa;
-  transform: translateX(5px);
-}
-
-/* ==================== BADGES (GAMIFICATION) ==================== */
-.badge-item {
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.badge-item:hover {
-  transform: scale(1.1) rotate(5deg);
-}
-
-.badge-icon {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  color: white;
-  margin: 0 auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* ==================== PROGRESS BARS ==================== */
-.progress {
-  border-radius: 10px;
-  background: #e9ecef;
-}
-
-.progress-bar {
-  border-radius: 10px;
-  transition: width 0.6s ease;
-}
-
-/* ==================== MAP STYLES ==================== */
+/* ==================== LEAFLET MAP CUSTOMIZATION ==================== */
 #map {
-  border-radius: 12px;
+  border-radius: 1rem;
   overflow: hidden;
 }
 
 .leaflet-container {
   font-family: inherit;
+  border-radius: 1rem;
 }
 
-/* Marker tweaks for FontAwesome divIcon markers used by the app */
+/* Marker tweaks for FontAwesome divIcon markers */
 .fa-map-marker-divicon {
-  pointer-events: auto; /* allow popup interactions */
+  pointer-events: auto;
   text-align: center;
 }
+
 .fa-map-marker-divicon i {
-  transform: translateY(-6px); /* lift icon so tip points correctly */
+  transform: translateY(-6px);
   font-size: 28px;
   line-height: 28px;
-  color: #d00;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  color: #dc2626;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
-/* ==================== DROPDOWN MENUS ==================== */
-.dropdown-menu {
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  padding: 0.5rem;
+.leaflet-popup-content-wrapper {
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
-.dropdown-item {
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  padding: 0.6rem 1rem;
-}
-
-.dropdown-item:hover {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  transform: translateX(5px);
-}
-
-/* ==================== FOOTER ==================== */
-footer {
-  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-}
-
-footer a {
-  transition: all 0.3s ease;
-}
-
-footer a:hover {
-  color: var(--primary-color) !important;
-  transform: translateX(3px);
-}
-
-/* ==================== LOADING SPINNER ==================== */
-.spinner-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-}
-
-/* ==================== TOOLTIPS ==================== */
-.tooltip-inner {
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
+.leaflet-popup-tip {
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.2);
 }
 
 /* ==================== SCROLL TO TOP ==================== */
@@ -379,9 +193,9 @@ footer a:hover {
   position: fixed;
   bottom: 2rem;
   right: 2rem;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 9999px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   display: flex;
@@ -390,7 +204,7 @@ footer a:hover {
   font-size: 1.5rem;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transition: all 0.18s ease;
+  transition: all 0.3s ease;
   opacity: 0;
   visibility: hidden;
   z-index: 1000;
@@ -406,72 +220,236 @@ footer a:hover {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* ==================== RESPONSIVE ==================== */
+/* ==================== STAR RATING ==================== */
+.star-rating {
+  color: #fbbf24;
+  font-size: 1.125rem;
+}
+
+/* ==================== CHART.JS CUSTOMIZATION ==================== */
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* ==================== ALPINE.JS TRANSITIONS ==================== */
+[x-cloak] {
+  display: none !important;
+}
+
+/* ==================== RESPONSIVE UTILITIES ==================== */
 @media (max-width: 768px) {
-  .navbar-brand {
-    font-size: 1.2rem;
+  .scroll-to-top {
+    bottom: 20px !important;
+    right: 20px !important;
+    width: 45px;
+    height: 45px;
   }
 
-  .card {
-    margin-bottom: 1rem;
-  }
-
-  .btn-lg {
-    font-size: 1rem;
-    padding: 0.6rem 1.2rem;
+  .scroll-to-top i {
+    font-size: 16px;
   }
 }
 
-/* ==================== UTILITY CLASSES ==================== */
-.shadow-sm {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
-}
-
-.shadow {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
-}
-
-.shadow-lg {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
-}
-
-.text-gradient {
+/* ==================== SCROLL TO TOP BUTTON ==================== */
+.scroll-to-top {
+  position: fixed !important;
+  bottom: 30px !important;
+  right: 30px !important;
+  width: 50px;
+  height: 50px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  z-index: 99999 !important;
+  pointer-events: auto !important;
+}
+
+.scroll-to-top.show {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+}
+
+.scroll-to-top:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+}
+
+.scroll-to-top i {
+  font-size: 18px;
 }
 
 /* ==================== PRINT STYLES ==================== */
 @media print {
-  .navbar,
-  .footer,
-  .btn,
-  .modal {
+  .no-print,
+  header,
+  nav,
+  footer,
+  .scroll-to-top {
     display: none !important;
+  }
+
+  body {
+    background: white;
   }
 }
 
-/* Respect reduced motion preference: disable animations/transitions for users who opt out */
+/* ==================== ACCESSIBILITY & MOTION ==================== */
+/* Respect reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
   .fade-in,
-  .slide-in,
-  .card-hover,
-  .btn,
-  .location-card,
-  .leaderboard-item,
-  .badge-item,
-  .page-link,
-  .dropdown-item,
-  .progress-bar,
-  .review-item {
+  .slide-in {
     animation: none !important;
-    transition: none !important;
+  }
+
+  .hover-lift:hover {
     transform: none !important;
   }
 
-  /* Remove heavy backdrop effects when reduced motion is preferred */
-  .navbar {
-    backdrop-filter: none !important;
+  .scroll-to-top:hover {
+    transform: none !important;
   }
+}
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* ==================== CUSTOM SCROLLBAR ==================== */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #667eea #f1f5f9;
+}
+
+/* ==================== MODAL FIXES ==================== */
+/* Ensure modals appear above everything */
+.modal {
+  z-index: 1050;
+}
+
+.modal-backdrop {
+  z-index: 1040;
+}
+
+/* Fix modal content overflow */
+.modal-body {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+/* Improve modal form styling */
+.modal .form-control,
+.modal .form-select {
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s;
+}
+
+.modal .form-control:focus,
+.modal .form-select:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.modal .form-label {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+/* ==================== ADMIN PANEL FIXES ==================== */
+/* Compact typography */
+.admin-container table td,
+.admin-container table th {
+  font-size: 0.875rem;
+  padding: 0.75rem 0.75rem !important;
+}
+
+/* Allow wrapping for text-heavy columns to avoid horizontal scroll */
+.admin-container table td,
+.admin-container table th {
+  white-space: normal;
+}
+
+.admin-container table td:nth-child(2), /* Nama */
+.admin-container table td:nth-child(3)  /* Alamat */ {
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Keep actions in a single line */
+.admin-container table th:last-child,
+.admin-container table td:last-child {
+  white-space: nowrap;
+  min-width: 180px;
+}
+
+/* Better spacing for inline action buttons */
+.admin-container table td button,
+.admin-container table td a.inline-block {
+  margin-right: 0.375rem;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.875rem;
+}
+
+.admin-container table td form.inline {
+  display: inline-block;
+  margin-right: 0.375rem;
+}
+
+.admin-container table td form.inline:last-child {
+  margin-right: 0;
+}
+
+/* Table layout */
+.admin-container table {
+  table-layout: auto;
+  width: 100%;
+}
+
+/* Avoid forcing horizontal scroll globally */
+.admin-container .overflow-x-auto {
+  overflow-x: hidden;
 }

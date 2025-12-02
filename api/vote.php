@@ -24,6 +24,17 @@ if (!is_logged_in()) {
     exit;
 }
 
+// Rate limiting
+$user_id = $_SESSION['user_id'];
+if (!check_rate_limit('api_vote_' . $user_id, 20, 60)) {
+    $rate_info = get_rate_limit_info('api_vote_' . $user_id, 20, 60);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Terlalu banyak permintaan. Coba lagi dalam ' . $rate_info['reset_in'] . ' detik.'
+    ]);
+    exit;
+}
+
 // Only accept POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode([

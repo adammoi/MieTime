@@ -37,23 +37,23 @@ $page_description = substr($location['address'], 0, 150);
 include '../../includes/header.php';
 ?>
 
-<div class="container my-5">
-    <div class="row">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Main Content -->
-        <div class="col-lg-8">
+        <div class="lg:col-span-2">
             <!-- Location Header -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div>
-                            <h2 class="fw-bold mb-2"><?php echo htmlspecialchars($location['name']); ?></h2>
-                            <p class="text-muted mb-0">
-                                <i class="fas fa-map-marker-alt me-2"></i>
+            <div class="bg-white rounded-2xl shadow-lg mb-6">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1">
+                            <h2 class="text-3xl font-bold mb-2"><?php echo htmlspecialchars($location['name']); ?></h2>
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-map-marker-alt mr-2 text-red-500"></i>
                                 <?php echo htmlspecialchars($location['address']); ?>
                             </p>
                         </div>
                         <?php if (is_logged_in()): ?>
-                            <button class="btn btn-outline-danger" id="bookmarkBtn"
+                            <button class="px-4 py-2 border-2 border-red-500 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition" id="bookmarkBtn"
                                 data-location-id="<?php echo $location_id; ?>"
                                 data-bookmarked="<?php echo $is_bookmarked ? '1' : '0'; ?>">
                                 <i class="fas fa-heart<?php echo $is_bookmarked ? '' : '-broken'; ?>"></i>
@@ -62,41 +62,43 @@ include '../../includes/header.php';
                     </div>
 
                     <!-- Rating Summary -->
-                    <div class="d-flex align-items-center mb-3">
+                    <div class="flex items-center mb-4">
                         <?php if ($location['total_reviews'] > 0): ?>
-                            <div class="me-4">
-                                <h3 class="mb-0 fw-bold"><?php echo number_format($location['average_rating'], 1); ?></h3>
-                                <div><?php echo star_rating($location['average_rating']); ?></div>
-                                <small class="text-muted"><?php echo $location['total_reviews']; ?> review</small>
+                            <div class="mr-6">
+                                <h3 class="text-4xl font-bold mb-1"><?php echo number_format($location['average_rating'], 1); ?></h3>
+                                <div class="mb-1"><?php echo star_rating($location['average_rating']); ?></div>
+                                <small class="text-gray-500"><?php echo $location['total_reviews']; ?> review</small>
                             </div>
                         <?php else: ?>
-                            <div class="alert alert-info mb-0">
-                                <i class="fas fa-info-circle me-2"></i>Belum ada review. Jadilah yang pertama!
+                            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded w-full">
+                                <p class="text-blue-700">
+                                    <i class="fas fa-info-circle mr-2"></i>Belum ada review. Jadilah yang pertama!
+                                </p>
                             </div>
                         <?php endif; ?>
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="d-flex gap-2">
+                    <div class="flex gap-3">
                         <?php if (is_logged_in()): ?>
                             <a href="<?php echo BASE_URL; ?>review/add/<?php echo $location_id; ?>"
-                                class="btn btn-primary">
-                                <i class="fas fa-star me-2"></i>Tulis Review
+                                class="px-6 py-3 gradient-primary text-white font-semibold rounded-lg hover:shadow-lg transition">
+                                <i class="fas fa-star mr-2"></i>Tulis Review
                             </a>
                             <a href="<?php echo BASE_URL; ?>kedai/claim/<?php echo $location_id; ?>"
-                                class="btn btn-outline-secondary">
-                                <i class="fas fa-building me-2"></i>Klaim Kedai Ini
+                                class="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition">
+                                <i class="fas fa-building mr-2"></i>Klaim Kedai Ini
                             </a>
                         <?php else: ?>
-                            <button type="button" class="btn btn-primary"
+                            <button type="button" class="px-6 py-3 gradient-primary text-white font-semibold rounded-lg hover:shadow-lg transition"
                                 data-require-login
                                 data-action-text="menulis review">
-                                <i class="fas fa-star me-2"></i>Tulis Review
+                                <i class="fas fa-star mr-2"></i>Tulis Review
                             </button>
-                            <button type="button" class="btn btn-outline-secondary"
+                            <button type="button" class="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition"
                                 data-require-login
                                 data-action-text="klaim kedai ini">
-                                <i class="fas fa-building me-2"></i>Klaim Kedai Ini
+                                <i class="fas fa-building mr-2"></i>Klaim Kedai Ini
                             </button>
                         <?php endif; ?>
                     </div>
@@ -105,32 +107,32 @@ include '../../includes/header.php';
 
             <!-- Map -->
             <?php if ($location['latitude'] && $location['longitude']): ?>
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-map me-2"></i>Lokasi</h5>
+                <div class="bg-white rounded-2xl shadow-lg mb-6 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h5 class="text-lg font-bold"><i class="fas fa-map mr-2 text-blue-600"></i>Lokasi</h5>
                     </div>
-                    <div class="card-body p-0">
+                    <div class="p-0">
                         <div id="map" style="height: 300px;"></div>
                     </div>
                 </div>
             <?php endif; ?>
 
             <!-- Reviews Section -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="fas fa-comments me-2"></i>
+            <div class="bg-white rounded-2xl shadow-lg">
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h5 class="text-lg font-bold">
+                        <i class="fas fa-comments mr-2 text-blue-600"></i>
                         Review (<?php echo count($reviews); ?>)
                     </h5>
-                    <select class="form-select form-select-sm" style="width: auto;" id="sortReviews">
+                    <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" id="sortReviews">
                         <option value="newest">Terbaru</option>
                         <option value="highest">Rating Tertinggi</option>
                         <option value="helpful">Paling Membantu</option>
                     </select>
                 </div>
-                <div class="card-body" id="reviewsList">
+                <div class="p-6" id="reviewsList">
                     <?php if (empty($reviews)): ?>
-                        <p class="text-center text-muted py-5">
+                        <p class="text-center text-gray-500 py-12">
                             Belum ada review. Jadilah yang pertama menulis review!
                         </p>
                     <?php else: ?>
@@ -138,47 +140,47 @@ include '../../includes/header.php';
                             $review_images = get_review_images($review['review_id']);
                             $user_vote = is_logged_in() ? get_user_vote($review['review_id'], get_current_user_id()) : null;
                         ?>
-                            <div class="review-item border-bottom pb-3 mb-3">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="review-item border-b border-gray-200 pb-4 mb-4 last:border-b-0">
+                                <div class="flex justify-between items-start mb-3">
                                     <div>
-                                        <h6 class="mb-1 fw-bold">
-                                            <i class="fas fa-user-circle text-muted me-1"></i>
+                                        <h6 class="font-bold text-gray-900 mb-1">
+                                            <i class="fas fa-user-circle text-gray-400 mr-1"></i>
                                             <?php echo htmlspecialchars($review['username']); ?>
                                             <?php if ($review['role'] === 'verified_owner'): ?>
-                                                <span class="badge bg-success">Verified Owner</span>
+                                                <span class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">Verified Owner</span>
                                             <?php endif; ?>
                                         </h6>
-                                        <small class="text-muted"><?php echo time_ago($review['created_at']); ?></small>
+                                        <small class="text-gray-500"><?php echo time_ago($review['created_at']); ?></small>
                                     </div>
                                     <div>
                                         <?php echo star_rating($review['rating']); ?>
                                     </div>
                                 </div>
 
-                                <p class="mb-2"><?php echo nl2br(htmlspecialchars($review['review_text'])); ?></p>
+                                <p class="mb-3 text-gray-700"><?php echo nl2br(htmlspecialchars($review['review_text'])); ?></p>
 
                                 <!-- Review Images -->
                                 <?php if (!empty($review_images)): ?>
-                                    <div class="d-flex gap-2 mb-2 flex-wrap">
+                                    <div class="flex gap-2 mb-3 flex-wrap">
                                         <?php foreach ($review_images as $image): ?>
                                             <img src="<?php echo BASE_URL . 'get_image.php?path=' . urlencode($image['file_path']); ?>"
-                                                class="rounded" style="width: 100px; height: 100px; object-fit: cover; cursor: pointer;"
+                                                class="rounded-lg cursor-pointer hover:opacity-90 transition" style="width: 100px; height: 100px; object-fit: cover;"
                                                 onclick="window.open(this.src, '_blank')">
                                         <?php endforeach; ?>
                                     </div>
                                 <?php endif; ?>
 
                                 <!-- Vote Buttons -->
-                                <div class="d-flex gap-2 align-items-center">
+                                <div class="flex gap-2 items-center">
                                     <?php if (is_logged_in()): ?>
-                                        <button class="btn btn-sm btn-outline-success vote-btn"
+                                        <button class="px-3 py-1 border border-green-500 text-green-600 rounded-lg hover:bg-green-50 transition vote-btn"
                                             data-review-id="<?php echo $review['review_id']; ?>"
                                             data-vote-type="1"
                                             <?php echo ($user_vote && $user_vote['vote_type'] == 1) ? 'disabled' : ''; ?>>
                                             <i class="fas fa-thumbs-up"></i>
                                             <span><?php echo $review['upvotes']; ?></span>
                                         </button>
-                                        <button class="btn btn-sm btn-outline-danger vote-btn"
+                                        <button class="px-3 py-1 border border-red-500 text-red-600 rounded-lg hover:bg-red-50 transition vote-btn"
                                             data-review-id="<?php echo $review['review_id']; ?>"
                                             data-vote-type="-1"
                                             <?php echo ($user_vote && $user_vote['vote_type'] == -1) ? 'disabled' : ''; ?>>
@@ -186,21 +188,19 @@ include '../../includes/header.php';
                                             <span><?php echo $review['downvotes']; ?></span>
                                         </button>
                                     <?php else: ?>
-                                        <span class="text-muted small">
-                                            <i class="fas fa-thumbs-up me-1"></i><?php echo $review['upvotes']; ?> helpful
+                                        <span class="text-gray-500 text-sm">
+                                            <i class="fas fa-thumbs-up mr-1"></i><?php echo $review['upvotes']; ?> helpful
                                         </span>
                                     <?php endif; ?>
 
                                     <?php if (is_logged_in() && (get_current_user_id() == $review['user_id'] || is_admin_or_moderator())): ?>
-                                        <div class="dropdown ms-auto">
-                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="reviewMenu<?php echo (int)$review['review_id']; ?>" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <div class="ml-auto relative inline-block text-left" x-data="{ open: false }">
+                                            <button @click="open = !open" class="px-3 py-1 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition">
                                                 <i class="fas fa-ellipsis-v"></i>
                                             </button>
-                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="reviewMenu<?php echo (int)$review['review_id']; ?>">
-                                                <li>
-                                                    <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/reviews/edit.php?review_id=<?php echo (int)$review['review_id']; ?>">Edit</a>
-                                                </li>
-                                            </ul>
+                                            <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                                                <a href="<?php echo BASE_URL; ?>pages/reviews/edit.php?review_id=<?php echo (int)$review['review_id']; ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>
+                                            </div>
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -212,50 +212,58 @@ include '../../includes/header.php';
         </div>
 
         <!-- Sidebar -->
-        <div class="col-lg-4">
+        <div class="lg:col-span-1">
             <!-- Info Card -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informasi</h6>
+            <div class="bg-white rounded-2xl shadow-lg mb-6 overflow-hidden">
+                <div class="px-6 py-4 gradient-primary">
+                    <h6 class="font-bold text-white"><i class="fas fa-info-circle mr-2"></i>Informasi</h6>
                 </div>
-                <div class="card-body">
-                    <p class="mb-2">
-                        <strong><i class="fas fa-star text-warning me-2"></i>Rating:</strong><br>
-                        <?php if ($location['total_reviews'] > 0): ?>
-                            <?php echo number_format($location['average_rating'], 1); ?> / 5.0
-                        <?php else: ?>
-                            Belum ada rating
-                        <?php endif; ?>
+                <div class="p-6">
+                    <p class="mb-4">
+                        <strong class="block text-gray-700 mb-1">
+                            <i class="fas fa-star text-yellow-500 mr-2"></i>Rating:
+                        </strong>
+                        <span class="text-gray-600">
+                            <?php if ($location['total_reviews'] > 0): ?>
+                                <?php echo number_format($location['average_rating'], 1); ?> / 5.0
+                            <?php else: ?>
+                                Belum ada rating
+                            <?php endif; ?>
+                        </span>
                     </p>
-                    <p class="mb-2">
-                        <strong><i class="fas fa-comment text-primary me-2"></i>Total Review:</strong><br>
-                        <?php echo $location['total_reviews']; ?> review
+                    <p class="mb-4">
+                        <strong class="block text-gray-700 mb-1">
+                            <i class="fas fa-comment text-blue-600 mr-2"></i>Total Review:
+                        </strong>
+                        <span class="text-gray-600"><?php echo $location['total_reviews']; ?> review</span>
                     </p>
                     <p class="mb-0">
-                        <strong><i class="fas fa-calendar text-success me-2"></i>Ditambahkan:</strong><br>
-                        <?php echo format_date_id($location['created_at']); ?>
+                        <strong class="block text-gray-700 mb-1">
+                            <i class="fas fa-calendar text-green-600 mr-2"></i>Ditambahkan:
+                        </strong>
+                        <span class="text-gray-600"><?php echo format_date_id($location['created_at']); ?></span>
                     </p>
                 </div>
             </div>
 
             <!-- Share Card -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
-                    <h6 class="mb-0"><i class="fas fa-share-alt me-2"></i>Bagikan</h6>
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h6 class="font-bold text-gray-900"><i class="fas fa-share-alt mr-2 text-blue-600"></i>Bagikan</h6>
                 </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-outline-primary btn-sm" onclick="shareToFacebook()">
-                            <i class="fab fa-facebook me-2"></i>Facebook
+                <div class="p-6">
+                    <div class="space-y-2">
+                        <button class="w-full px-4 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-50 transition" onclick="shareToFacebook()">
+                            <i class="fab fa-facebook mr-2"></i>Facebook
                         </button>
-                        <button class="btn btn-outline-info btn-sm" onclick="shareToTwitter()">
-                            <i class="fab fa-twitter me-2"></i>Twitter
+                        <button class="w-full px-4 py-2 border border-sky-500 text-sky-600 rounded-lg hover:bg-sky-50 transition" onclick="shareToTwitter()">
+                            <i class="fab fa-twitter mr-2"></i>Twitter
                         </button>
-                        <button class="btn btn-outline-success btn-sm" onclick="shareToWhatsApp()">
-                            <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                        <button class="w-full px-4 py-2 border border-green-500 text-green-600 rounded-lg hover:bg-green-50 transition" onclick="shareToWhatsApp()">
+                            <i class="fab fa-whatsapp mr-2"></i>WhatsApp
                         </button>
-                        <button class="btn btn-outline-secondary btn-sm" onclick="copyLink()">
-                            <i class="fas fa-link me-2"></i>Copy Link
+                        <button class="w-full px-4 py-2 border border-gray-400 text-gray-600 rounded-lg hover:bg-gray-50 transition" onclick="copyLink()">
+                            <i class="fas fa-link mr-2"></i>Copy Link
                         </button>
                     </div>
                 </div>
